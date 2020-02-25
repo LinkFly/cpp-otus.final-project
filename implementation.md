@@ -11,14 +11,21 @@
  - Internal Presentation (IP)
    - Внутреннее представление кода (aka байт-код)
    - Внутреннее представление данных
- 
+     - Atom
+       - Symbol
+       - Number
+       - Function
+     - List
+       - Cons
+
  - Core
    - Описание: Интерпретирует IP вызывает соотв. внутренние функции (Internal Function - IF)
    - ...
     
  - Parser (включает):
-     - LexicalParser
-       - Разбивает на токены
+     - Reader (использует системную таблицу чтения)
+         - LexicalParser
+           - Разбивает на токены
      - ToIPConvertor
        - преобразует код во внутренние структуры
        
@@ -27,7 +34,5 @@
    
  - Repl
    - Сущность обеспечивающая цикл чтения-вычисления-печати (Read Eval Print Loop - REPL)
-   
- - Reader
-   (скорее Not Implemeted в первой версии)
+
 
