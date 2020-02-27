@@ -17,6 +17,12 @@
        - Function
      - List
        - Cons
+   - Core-структуры (внутренние структуры интерпретатора)
+     - Scope
+     - ...
+     - DIBuilder (Dependency Injection Builder) - класс обеспечивающий постройку всех объектов,
+       согласно конфигу
+     
 
  - Core
    - Описание: Интерпретирует IP вызывает соотв. внутренние функции (Internal Function - IF)
