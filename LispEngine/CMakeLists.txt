@@ -6,26 +6,38 @@ message("[INFO] Using env variable `BOOST_LIBRARYDIR` = $ENV{BOOST_LIBRARYDIR}")
 project(lisp_engine VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 
 set(SOURCES
-	main.cpp
+	src/main.cpp
 	)
 set(HEADERS
-	share.h
-	
+	src/share-base.h
+	src/Global.h
+	src/share.h
+	src/interfaces/evaluator/IProgram.h
+	src/interfaces/DataStructs.h
+	src/implements/DataStructs.h
+	src/interfaces/IDIBuilder.h
+	src/implements/DIBuilder.h
+
+
+	src/LispEngine.h
+	)
+set(TEST_SOURCES
+	src/tests.cpp
 	)
 set(TESTS_HEADERS
 
 	)
 set(DATA_FILES
-	Readme.md
+	#Readme.md
 
 	)
 option(LOGS "Enable output logs" false)
-configure_file(configure.h.in configure.h)
+configure_file(src/configure.h.in ../build/configure.h)
 
 add_executable(lisp_engine ${SOURCES} ${HEADERS} ${DATA_FILES})
-add_executable(lisp_engine-orig stub.cpp)
-add_executable(tests tests.cpp ${TESTS_HEADERS} ${HEADERS})
-add_executable(tests-orig stub.cpp)
+#add_executable(lisp_engine-orig stub.cpp)
+add_executable(tests ${TEST_SOURCES} ${TESTS_HEADERS} ${HEADERS})
+#add_executable(tests-orig stub.cpp)
 set_target_properties(lisp_engine tests PROPERTIES
 	CXX_STANDARD 11
 	CXX_STANDARD_REQUIRED ON
@@ -98,15 +110,15 @@ add_test(lisp_engine_tests tests)
 
 ### Packaging ###
 install(TARGETS lisp_engine RUNTIME DESTINATION bin)
-install(TARGETS lisp_engine-orig RUNTIME DESTINATION bin)
-install(FILES build/lisp_engine-config.conf DESTINATION bin)
+#install(TARGETS lisp_engine-orig RUNTIME DESTINATION bin)
+#install(FILES build/lisp_engine-config.conf DESTINATION bin)
 
 install(DIRECTORY build/boost_factory/usr/lib/boost_1_72_0 DESTINATION bin/boost_factory/usr/lib/)
 
 install(DIRECTORY tests/fixtures DESTINATION lib/lisp_engine/tests)
 install(TARGETS tests RUNTIME DESTINATION lib/lisp_engine/tests)
-install(TARGETS tests-orig RUNTIME DESTINATION lib/lisp_engine/tests)
-install(FILES build/tests-config.conf DESTINATION lib/lisp_engine/tests)
+#install(TARGETS tests-orig RUNTIME DESTINATION lib/lisp_engine/tests)
+#install(FILES build/tests-config.conf DESTINATION lib/lisp_engine/tests)
 
 set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
