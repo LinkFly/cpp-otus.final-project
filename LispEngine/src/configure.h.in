@@ -1,0 +1,9 @@
+#pragma once
+
+#cmakedefine LOGS @LOGS@
+const bool ENABLE_LOGS = 
+#ifdef LOGS
+	true;
+#else
+	false;
+#endif
