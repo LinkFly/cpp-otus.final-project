@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <memory>
 
+using std::cout;
 using std::cerr;
 using std::endl;
 using std::string;
@@ -26,5 +27,12 @@ void error(const string& errMes, int errCode = -1) {
 
 using short_size = uint8_t;
 using Cid = uint16_t;
+using gstring = std::string;
+using gchar = char;
 
-
+class DIBuilder;
+class Sexpr;
+class LispFunction;
+class ArgsList;
+class CallResult;
+using PSexpr = shared_ptr<Sexpr>;

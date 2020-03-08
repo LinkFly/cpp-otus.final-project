@@ -2,7 +2,7 @@
 
 #include "share-base.h"
 
-enum class ETypeId { pointer, number, symbol, function, cons };
+enum class ETypeId { nil, pointerToAtom, pointerToCons, number, symbol, function, cons, custom };
 
 class Global {
 	// meta handling ETypeId
