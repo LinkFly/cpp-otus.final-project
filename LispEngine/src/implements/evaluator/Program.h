@@ -42,19 +42,6 @@ public:
 	}
 };
 
-//class Program : public IProgram, CClass {
-//	unique_ptr<IMemoryManager> mman;
-//
-//
-//	constructor(unique_ptr<IMemoryManager> mman) override {
-//
-//	}
-//public:
-//	Program(unique_ptr<IMemoryManager> mman) {
-//		constructor(mman);
-//	}
-//};
-
 class ArgsList : public CClass {
 	vector<shared_ptr<Sexpr>> args;
 public:

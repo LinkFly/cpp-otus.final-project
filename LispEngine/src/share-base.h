@@ -38,4 +38,3 @@ class LispFunction;
 class ArgsList;
 class CallResult;
 using PSexpr = shared_ptr<Sexpr>;
-class PlusLispFunction;

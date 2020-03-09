@@ -48,54 +48,6 @@ public:
 	}
 };
 
-//class Atom : public IAtom, CClass {
-//	shared_ptr<IValue> value;
-//protected:
-//	void constructor(shared_ptr<IValue> val) override {
-//		value = val;
-//	}
-//public:
-//	Atom() = default;
-//
-//	Atom(shared_ptr<IValue> val) {
-//		constructor(val);
-//	}
-//	bool isAtom() override {
-//		return true;
-//	}
-//	shared_ptr<IValue> getValue() override {
-//		return value;
-//	}
-//};
-
-//class Number : public Atom, public INumber {
-//	/*NumberValue numVal;*/
-//	bool isAtom() override {
-//		return Atom::isAtom();
-//	}
-//
-//	void constructor(shared_ptr<IValue> val) override {
-//		Atom::constructor(val);
-//	}
-//	virtual shared_ptr<IValue> getValue() override {
-//		return Atom::getValue();
-//	}
-//	/*virtual int32_t getNumber() = 0;*/
-//
-//	void constructor(int32_t num) override {
-//		auto numVal = make_shared<NumberValue>(num);
-//		Atom::constructor(numVal);
-//	}
-//public:
-//	Number(int32_t num) {
-//		constructor(num);
-//	}
-//	
-//	int32_t getNumber() {
-//		return dynamic_cast<NumberValue*>(Atom::getValue().get())->getNumber();
-//	}
-//};
-
 class Block: public CClass {
 public:
 	uint8_t* ptr = nullptr;
@@ -136,8 +88,6 @@ class CustomType: TypeBaseStruct {
 
 struct ConsStruct {
 	Cell* pCell;
-	//PSexpr _car;
-	//PSexpr _cdr;
 };
 
 struct SymbolDesc {
@@ -149,16 +99,6 @@ struct SymbolDesc {
 struct SymbolStruct {
 	//unique_ptr<SymbolDesc> symDesc;
 	SymbolDesc* symDesc;
-	/*SymbolStruct() {
-		symDesc.swap(make_unique<SymbolDesc>());
-	}*/
-	//~SymbolStruct() {
-	//	delete symDesc;
-	//}
-	/*unique_ptr<SymbolDesc> symDesc;*/
-	//SymbolStruct() : symDesc{ nullptr } {
-	//	symDesc.reset(nullptr);
-	//}
 };
 
 struct CustomTypeStruct {
@@ -250,29 +190,6 @@ public:
 	}
 };
 
-//class PointerAtom : public Atom {
-//	DynamicType dtype;
-//public:
-//	PointerAtom(Atom* val) {
-//		dtype.typeId = ETypeId::pointerToAtom;
-//		dtype.block.ptr = reinterpret_cast<uint8_t*>(val);
-//	}
-//	Atom* getValue() {
-//		return reinterpret_cast<Atom*>(dtype.block.ptr);
-//	}
-//};
-//
-//class PointerCons : public Atom {
-//public:
-//	PointerCons(Cons* val) {
-//		dtype.typeId = ETypeId::pointerToCons;
-//		dtype.block.ptr = reinterpret_cast<uint8_t*>(val);
-//	}
-//	Cons* getValue() {
-//		return reinterpret_cast<Cons*>(dtype.block.ptr);
-//	}
-//};
-
 class Nil : public Atom {
 public:
 	Nil() {
@@ -296,14 +213,11 @@ public:
 		dtype.typeId = ETypeId::function;
 		dtype.tstruct.function.func = lispFunc.get();
 		getMemMan().takeSharedPtrFunc(lispFunc.get(), lispFunc);
-		/*func = lispFunc;*/
 	}
 	~Function() {
 		getMemMan().freeSharedPtrFunc(dtype.tstruct.function.func);
 	}
-	/*shared_ptr<LispFunction> getValue() {
-		return func;
-	}*/
+
 	LispFunction& getValue() {
 		return *dtype.tstruct.function.func;
 	}
@@ -311,7 +225,6 @@ public:
 	void call(ArgsList& args, CallResult& result) {
 		LispFunction& fn = *(dtype.tstruct.function.func);
 		fn.call(args, result);
-		/*getValue().call(args, result);*/
 	}
 };
 

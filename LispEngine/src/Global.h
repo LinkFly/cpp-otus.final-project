@@ -8,11 +8,9 @@ class Global {
 public:
 	// meta handling ETypeId
 	static const short_size typeIdBits = 4;
-	shared_ptr<DIBuilder> diBuilder;
+	/*shared_ptr<DIBuilder> diBuilder;*/
 	shared_ptr<IMemoryManager> memoryManager;
 	Global() {
-		/*auto diBuilder = getDiBuilder();
-		memoryManager = diBuilder->createMemoryManager();*/
 		memoryManager = std::dynamic_pointer_cast<IMemoryManager>(make_shared<MemoryManager>());
 
 	}

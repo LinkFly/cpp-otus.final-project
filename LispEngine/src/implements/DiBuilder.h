@@ -38,18 +38,6 @@ class DIBuilder : public IDIBuilder, CClass {
 public:
 
 	DIBuilder() = default;
-	//template<class Interface, class Implement, typename ...Args>
-	//void bind() {
-	//	bind_constructor(EOpType::bind, Args... args);
-	//}
-
-	//template<class Implement, typename ...Args>
-	//shared_ptr<Implement> bind_constructor(EOpType opType, Args... args) {
-	//	if (opType == EOpType::bind) {
-	//		return shared_ptr<Implement>(nullptr);
-	//	}
-	//	return std::make_shared<Implement>(args...);
-	//}
 
 	template<class Interface>
 	Interface& get() {
@@ -58,8 +46,7 @@ public:
 
 	template<class Implement, typename ...Args>
 	shared_ptr<Implement> create(Args... args) {
-		/*return bind_constructor(EOpType::create, Args... args);*/
-		/*return shared_ptr<Implement>{nullptr};*/
+		// TODO Create error function
 		cerr << "ERROR: Bad creating\n";
 		exit(-1);
 	}
@@ -89,7 +76,6 @@ public:
 
 	shared_ptr<Nil> createNil() {
 		return make_shared<Nil>();
-		//return shared_ptr<Nil>(new Nil());
 	}
 
 	// TODO!!! Don't work (why???)

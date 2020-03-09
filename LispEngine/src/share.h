@@ -3,12 +3,12 @@
 #include "share-base.h"
 #include "Global.h"
 
-class IInterface {
+// Not fields
+class CBaseClass {
 
 };
 
-// Not fields
-class CBaseClass {
+class IInterface : public CBaseClass {
 
 };
 
