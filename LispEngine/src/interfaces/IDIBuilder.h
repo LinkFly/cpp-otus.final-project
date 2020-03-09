@@ -21,7 +21,7 @@ public:
 	virtual shared_ptr<IScope> createScope() = 0;
 	virtual shared_ptr<Number> createNumber(int32_t num) = 0;
 	virtual shared_ptr<Nil> createNil() = 0;
-	virtual shared_ptr<Symbol> createSymbol(gstring& symName) = 0;
+	virtual shared_ptr<Symbol> createSymbol(const gstring& symName) = 0;
 
 	template<class SexprChild1, class SexprChild2>
 	shared_ptr<Cons> createCons(SexprChild1& sexpr1OrChild, SexprChild2& sexpr2OrChild) {

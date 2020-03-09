@@ -85,13 +85,8 @@ public:
 	//	return shared_ptr<Symbol>(new Symbol(symName));
 	//}
 
-	shared_ptr<Symbol> createSymbol(gstring& symName) {
+	shared_ptr<Symbol> createSymbol(const gstring& symName) {
 		return shared_ptr<Symbol>(new Symbol(symName));
-	}
-
-	template<>
-	shared_ptr<PlusLispFunction> create<PlusLispFunction>() {
-		return make_shared<PlusLispFunction>();
 	}
 
 	template<>
@@ -130,4 +125,9 @@ public:
 	/*shared_ptr<ILispEngine> createLispEngine() {
 		return std::dynamic_pointer_cast<ILispEngine>(make_shared<LispEngine>());
 	}*/
+
+	template<>
+	shared_ptr<PlusLispFunction> create<PlusLispFunction>() {
+		return make_shared<PlusLispFunction>();
+	}
 };

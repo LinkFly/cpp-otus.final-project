@@ -230,7 +230,7 @@ public:
 
 class Symbol : public Atom {
 public:
-	Symbol(gstring& name) {
+	Symbol(const gstring& name) {
 		dtype.typeId = ETypeId::symbol;
 		SymbolDesc*& symDesc = dtype.tstruct.symbol.symDesc;
 		symDesc = new SymbolDesc;

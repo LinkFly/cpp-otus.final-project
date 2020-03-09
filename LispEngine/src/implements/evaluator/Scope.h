@@ -17,7 +17,7 @@ class Scope : public IScope, public CClass {
 	shared_ptr<IScope> parentScope;
 	//DIBuilder diBuilder;
 public:
-	virtual void add(gstring& name, PSexpr& sexpr) override {
+	virtual void add(const gstring& name, PSexpr& sexpr) override {
 		(*nsTable)[name] = sexpr;
 	}
 	virtual PSexpr& get(gstring& name) override {

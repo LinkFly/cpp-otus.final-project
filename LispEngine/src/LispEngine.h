@@ -18,8 +18,8 @@ class LispEngine : public CClass {
 	shared_ptr<IScope> scope = diBuilder.createScope();
 	shared_ptr<IProgram> program = diBuilder.createProgram(idiBuilder);
 	shared_ptr<IEvaluator> evaluator = diBuilder.createEvaluator();
-
-	PSexpr createSymbol(gstring& symName) {
+	shared_ptr<SetfSymbolFunction> setfSymbolFunction = diBuilder.create<SetfSymbolFunction>();
+	PSexpr createSymbol(const gstring& symName) {
 		PSexpr symSexpr = diBuilder.createSymbol(symName);
 		program->getProgramContext()->getScope()->add(symName, symSexpr);
 		return symSexpr;
@@ -28,21 +28,24 @@ class LispEngine : public CClass {
 	PSexpr& getSymbol(gstring& symName) {
 		return scope->get(symName);
 	}
-public:
-	LispEngine() {
-		program->getProgramContext()->setScope(scope);
-
-		gstring symName = "plus";
+	template<class TConcreteFunction>
+	void registerLispFunction(const gstring& symName) {
 		PSexpr symSexpr = createSymbol(symName);
 
-		shared_ptr<LispFunction> plusLispFunction = diBuilder.create<PlusLispFunction>();
+		shared_ptr<LispFunction> plusLispFunction = diBuilder.create<TConcreteFunction>();
 		shared_ptr<Function> plusFunction = diBuilder.createFunction(plusLispFunction);
 
-		shared_ptr<SetfSymbolFunction> setfSymbolFunction = diBuilder.create<SetfSymbolFunction>();
+
 		PSexpr plusFuncSexpr = std::static_pointer_cast<Sexpr>(plusFunction);
 		ArgsList args(symSexpr, plusFuncSexpr);
 		CallResult callRes;
 		setfSymbolFunction->call(args, callRes);
+	}
+public:
+	LispEngine() {
+		program->getProgramContext()->setScope(scope);
+		registerLispFunction<PlusLispFunction>("plus");
+
 	}
 	void readProgram(gstring& sProgram) {
 		reader->read(sProgram, *program.get());
