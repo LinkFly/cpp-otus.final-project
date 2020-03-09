@@ -9,6 +9,7 @@
 #include "interfaces/evaluator/IProgram.h"
 
 #include "implements/evaluator/Program.h"
+#include "BaseFunctions.h"
 
 class LispEngine : public CClass {
 	DIBuilder diBuilder;
@@ -35,7 +36,6 @@ public:
 		PSexpr symSexpr = createSymbol(symName);
 
 		shared_ptr<LispFunction> plusLispFunction = diBuilder.create<PlusLispFunction>();
-		//cout << "plusLispFunction(plusLispFunction): " << plusLispFunction.get() << endl;
 		shared_ptr<Function> plusFunction = diBuilder.createFunction(plusLispFunction);
 
 		shared_ptr<SetfSymbolFunction> setfSymbolFunction = diBuilder.create<SetfSymbolFunction>();
@@ -43,23 +43,6 @@ public:
 		ArgsList args(symSexpr, plusFuncSexpr);
 		CallResult callRes;
 		setfSymbolFunction->call(args, callRes);
-		/*auto curFnInScope = _getFn();
-		PlusLispFunction& plusFn = *((PlusLispFunction*)(_getFnFromSym(symSexpr)));
-		cout << "plusLispFunction(fromSym): " << plusLispFunction.get() << endl;
-		cout << "plusLispFunction(LispEngine): " << plusLispFunction.get() << endl;
-		cout << "plusLispFunction(inScope): " << _getFn() << endl;
-
-		PlusLispFunction& plusFn2 = *((PlusLispFunction*)(_getFn()));
-		cout << "plusLispFunction(as PlusLispFunction): " << &plusFn2 << endl;*/
-	}
-	void* _getFnFromSym(PSexpr& sexpr) {
-		return sexpr->_getDType().tstruct.symbol.symDesc->fbound->_getDType().tstruct.function.func;
-	}
-	void* _getFn() {
-		auto scope = program->getProgramContext()->getScope();
-		gstring name = "plus";
-		PSexpr& sexpr = scope->get(name);
-		return _getFnFromSym(sexpr);
 	}
 	void readProgram(gstring& sProgram) {
 		reader->read(sProgram, *program.get());

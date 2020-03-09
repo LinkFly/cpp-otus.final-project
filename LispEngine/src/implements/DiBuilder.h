@@ -21,6 +21,7 @@
 #include "../implements/evaluator/Reader.h";
 #include "../implements/evaluator/Program.h";
 #include "../implements/evaluator/Evaluator.h";
+#include "../BaseFunctions.h"
 
 // test
 #include "../test.h"

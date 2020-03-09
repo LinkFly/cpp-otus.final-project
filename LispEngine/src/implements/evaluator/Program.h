@@ -93,24 +93,6 @@ class LispSetfFunction : public LispFunction {
 	//virtual void call(ArgsList& args, Sexpr& modifiable, CallResult& result) = 0;
 };
 
-class PlusLispFunction : public LispFunction {
-public:
-	void call(ArgsList& args, CallResult& res) override {
-		auto oneArg = reinterpret_cast<Number*>(args.get(0).get());
-		auto twoArg = reinterpret_cast<Number*>(args.get(1).get());
-		if (oneArg == nullptr || twoArg == nullptr) {
-			cerr << "Bad args\n";
-			exit(-1);
-		}
-		//Sexpr* resNumber = new Number(oneArg->getValue() + twoArg->getValue());
-		shared_ptr<Sexpr> resNumber = std::static_pointer_cast<Sexpr>(
-			make_shared<Number>(oneArg->getValue() + twoArg->getValue()));
-		res.setResult(resNumber, nullptr /*[resNumber]() {
-			delete resNumber;
-			}*/);
-	}
-};
-
 class SetfSymbolFunction : public LispSetfFunction {
 public:
 	void call(ArgsList& args, CallResult& result) override {
@@ -160,3 +142,21 @@ public:
 		return context;
 	}
 };
+
+//class PlusLispFunction : public LispFunction {
+//public:
+//	//void call(ArgsList& args, CallResult& res) override {
+//	//	auto oneArg = reinterpret_cast<Number*>(args.get(0).get());
+//	//	auto twoArg = reinterpret_cast<Number*>(args.get(1).get());
+//	//	if (oneArg == nullptr || twoArg == nullptr) {
+//	//		cerr << "Bad args\n";
+//	//		exit(-1);
+//	//	}
+//	//	//Sexpr* resNumber = new Number(oneArg->getValue() + twoArg->getValue());
+//	//	shared_ptr<Sexpr> resNumber = std::static_pointer_cast<Sexpr>(
+//	//		make_shared<Number>(oneArg->getValue() + twoArg->getValue()));
+//	//	res.setResult(resNumber, nullptr /*[resNumber]() {
+//	//		delete resNumber;
+//	//		}*/);
+//	//}
+//};
