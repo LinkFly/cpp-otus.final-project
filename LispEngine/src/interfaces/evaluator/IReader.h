@@ -6,4 +6,5 @@
 class IReader : public IInterface {
 public:
 	virtual void read(gstring& programText, IProgram& program) = 0;
+	virtual PSexpr parseSymbol(gstring token, IProgram& program) = 0;
 };

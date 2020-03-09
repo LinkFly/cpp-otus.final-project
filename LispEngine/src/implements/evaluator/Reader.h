@@ -3,6 +3,7 @@
 #include <map>
 #include <functional>
 #include <vector>
+#include <stack>
 
 #include "../../share.h"
 #include "../../interfaces/evaluator/IReader.h"
@@ -13,6 +14,7 @@
 using std::map;
 using std::function;
 using std::vector;
+using std::stack;
 
 enum class Ops {
 	startList, endList, startNumber, startSymbol
@@ -161,25 +163,26 @@ class Reader : public IReader, public CClass {
 		int32_t num = std::stoi(token);
 		return diBuilder.createNumber(num);
 	}
-	PSexpr parseSymbol(gstring token, IProgram& program) {
-		/*return diBuilder.createSymbol(token);*/
-		return program.getProgramContext()->getScope()->get(token);
-	}
 public:
 	Reader(IDIBuilder& diBuilder) : diBuilder{ diBuilder } {
 
+	}
+
+	virtual PSexpr parseSymbol(gstring token, IProgram& program) override {
+		/*return diBuilder.createSymbol(token);*/
+		return program.getProgramContext()->getScope()->get(token);
 	}
 	
 	virtual void read(gstring& programText, IProgram& program) {
 		/*sReaderContext ctx;*/
 		ReadTable table;
-
 		PSexpr resSexpr;
-		PSexpr curSexpr;
 		bool isListStarted = false;
 		vector<PSexpr> list{};
+		stack<PSexpr> listStack;
+		stack<shared_ptr<vector<PSexpr>>> elemsStack;
 		
-		auto handleToken = [this, &program, &curSexpr, &isListStarted, &list](const ParseContext& ctx) {
+		auto handleToken = [this, &listStack, &elemsStack, &program, &resSexpr, &isListStarted, &list](const ParseContext& ctx) {
 			PSexpr cur;
 			if (ctx.likeType == LikeType::number) {
 				cur = parseNumber(ctx.curToken, program);
@@ -187,50 +190,46 @@ public:
 			else if (ctx.likeType == LikeType::symbol) {
 				cur = parseSymbol(ctx.curToken, program);
 			}
-			if (isListStarted) {
-				list.push_back(cur);
+			if (!listStack.empty() && !elemsStack.empty()) {
+				shared_ptr<vector<PSexpr>> curElemsList = elemsStack.top();
+				curElemsList->push_back(cur);
 			}
 			else {
-				curSexpr = cur;
+				resSexpr = cur;
 			}
 		};
-		auto handleStartList = [this, &curSexpr, &isListStarted]() {
+		auto handleStartList = [this, &elemsStack, &listStack, &resSexpr, &isListStarted]() {
 			isListStarted = true;
+			auto pElemsList = make_shared<vector<PSexpr>>();
+			elemsStack.push(pElemsList);
+			auto nil = diBuilder.createNil();
+			listStack.push(nil);
 		};
-		auto handleEndList = [this, &list, &curSexpr, &isListStarted]() {
+		auto handleEndList = [this, &elemsStack, &listStack, &list, &resSexpr, &isListStarted]() {
 			isListStarted = false;
-			curSexpr = diBuilder.createNil();
-			if (list.size() > 0) {
-				size_t cur = list.size();
+			auto elems = elemsStack.top();
+			elemsStack.pop();
+			auto curSexpr = listStack.top();
+			listStack.pop();
+			
+			if (elems->size() > 0) {
+				size_t cur = elems->size();
 				do {
 					--cur;
-					curSexpr = std::static_pointer_cast<Sexpr>(diBuilder.createCons(list[cur], curSexpr));
+					curSexpr = std::static_pointer_cast<Sexpr>(diBuilder.createCons((*elems)[cur], curSexpr));
 				} while (cur != 0);
-				//for (size_t cur = list.size() - 1; cur != 0; --cur) {
-				//	
-				//}
+			}
+
+			if (!listStack.empty() && !elemsStack.empty()) {
+				shared_ptr<vector<PSexpr>> curElemsList = elemsStack.top();
+				curElemsList->push_back(curSexpr);
+			}
+			else {
+				resSexpr = curSexpr;
 			}
 
 		};
 		parse(programText, handleToken, handleStartList, handleEndList);
-		program.addForm(curSexpr);
-
-		//shared_ptr<IScope> scope = diBuilder.createScope();
-
-		//shared_ptr<Number> num = diBuilder.createNumber(42);
-		//shared_ptr<Number> num2 = diBuilder.createNumber(3);
-		//gstring symName = "plus";
-		//PSexpr symSexpr = program.getProgramContext()->getScope()->get(symName);
-		///*PSexpr symSexpr = diBuilder.createSymbol(symName);*/
-
-		//shared_ptr<Sexpr> nilSexpr = diBuilder.createNil();
-		////auto nilSexpr = std::dynamic_pointer_cast<Sexpr>(nil);
-		//auto numSexpr = std::dynamic_pointer_cast<Sexpr>(num);
-		//auto num2Sexpr = std::dynamic_pointer_cast<Sexpr>(num2);
-		//shared_ptr<Sexpr> sexpr = diBuilder.createCons(num2Sexpr, nilSexpr);
-		//shared_ptr<Sexpr> sexpr2 = diBuilder.createCons(numSexpr, sexpr);
-		//shared_ptr<Sexpr> sexpr3 = diBuilder.createCons(symSexpr, sexpr2);
-
-		//program.addForm(sexpr3);
+		program.addForm(resSexpr);
 	}
 };

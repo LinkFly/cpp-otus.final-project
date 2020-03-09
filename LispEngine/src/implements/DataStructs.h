@@ -112,93 +112,128 @@ public:
 
 };
 
-//struct TypeBaseStruct {
-//
-//};
-//
-//struct NilStruct: TypeBaseStruct {
-//	void* nil = nullptr;
-//};
+struct TypeBaseStruct {
 
-//struct NumberStruct: TypeBaseStruct {
-//	int64_t num;
-//};
-//
-//class CustomType: TypeBaseStruct {
-//
-//};
-//
-//struct Cell {
-//
-//};
-//
-//struct ConsStruct {
-//	PSexpr _car;
-//	PSexpr _cdr;
-//};
-//
-//struct CustomTypeStruct {
-//	CustomType* pCustom;
-//};
+};
+
+struct NilStruct: TypeBaseStruct {
+	void* nil = nullptr;
+};
+
+struct NumberStruct: TypeBaseStruct {
+	int64_t num;
+	int64_t operator=(int64_t val) {
+		return num = val;
+	}
+	operator int64_t() {
+		return num;
+	}
+};
+
+class CustomType: TypeBaseStruct {
+
+};
+
+struct ConsStruct {
+	Cell* pCell;
+	//PSexpr _car;
+	//PSexpr _cdr;
+};
+
+struct SymbolDesc {
+	gstring name;
+	shared_ptr<Sexpr> bound;
+	shared_ptr<Sexpr> fbound;
+};
+
+struct SymbolStruct {
+	//unique_ptr<SymbolDesc> symDesc;
+	SymbolDesc* symDesc;
+	/*SymbolStruct() {
+		symDesc.swap(make_unique<SymbolDesc>());
+	}*/
+	//~SymbolStruct() {
+	//	delete symDesc;
+	//}
+	/*unique_ptr<SymbolDesc> symDesc;*/
+	//SymbolStruct() : symDesc{ nullptr } {
+	//	symDesc.reset(nullptr);
+	//}
+};
+
+struct CustomTypeStruct {
+	CustomType* pCustom;
+};
+
+struct FunctionStruct {
+	LispFunction* func;
+};
+
+union TypeStruct {
+	NilStruct nil;
+	NumberStruct number;
+	SymbolStruct symbol;
+	ConsStruct cons;
+	FunctionStruct function;
+	CustomTypeStruct custom;
+	public:
+		TypeStruct() {};
+		~TypeStruct() {};
+};
 
 class DynamicType: public CClass{
 public:
 	ETypeId typeId;
-	Block block;
-	//union TypeStruct {
-	//	NilStruct nil{};
-	//	NumberStruct num;
-	//	CustomTypeStruct custom;
-	//	TypeStruct() {};
-	//} tstruct;
-	//DynamicType() {};
+	TypeStruct tstruct;
 };
 
-class Type : public CClass {
-
-};
-
-class Sexpr : public CClass {
+class Sexpr : public CBaseClass {
 protected:
 	DynamicType dtype;
+public:
+	// for debug
+	DynamicType& _getDType() { return dtype; }
+	bool isCons() {
+		return dtype.typeId == ETypeId::cons;
+	}
+};
+
+struct Cell {
+	PSexpr car;
+	PSexpr cdr;
 };
 
 class Atom : public Sexpr {
 
 };
 
-
-
 class Cons : public Sexpr {
-	//using cons_t = tuple<Atom, Atom>;
-	PSexpr _car;
-	PSexpr _cdr;
+	IMemoryManager& getMemMan() {
+		auto& global = getGlobal();
+		return global.getMemoryManager();
+	}
 public:
-	Cons(shared_ptr<Sexpr>& car, shared_ptr<Sexpr>& cdr) : _car{ car }, _cdr{ cdr } {
+	Cons(PSexpr& car, PSexpr& cdr) {
 		dtype.typeId = ETypeId::cons;
-		/*dtype.block.init(sizeof(cons_t));
-		auto cons = std::make_tuple(car, cdr);
-		memcpy(dtype.block.ptr, &cons, sizeof(cons_t));*/
+		Cell*& pCell = dtype.tstruct.cons.pCell;
+		pCell = getMemMan().createCell();
+		pCell->car = car;
+		pCell->cdr = cdr;
+	}
+	~Cons() {
+		getMemMan().freeCell(dtype.tstruct.cons.pCell);
 	}
 	PSexpr car() {
-		return _car;
-		//return std::get<0>(*reinterpret_cast<cons_t*>(dtype.block.ptr));
+		return dtype.tstruct.cons.pCell->car;
 	}
 	PSexpr cdr() {
-		return _cdr;
-		//return std::get<1>(*reinterpret_cast<cons_t*>(dtype.block.ptr));
+		return dtype.tstruct.cons.pCell->cdr;
 	}
 	void car(PSexpr val) {
-		_car = val;
-		//std::get<0>(*reinterpret_cast<cons_t*>(dtype.block.ptr)) = val;
+		dtype.tstruct.cons.pCell->car = val;
 	}
 	void cdr(PSexpr val) {
-		_cdr = val;
-		//std::get<1>(*reinterpret_cast<cons_t*>(dtype.block.ptr)) = val;
-	}
-
-	~Cons() {
-		//cout << "=== Called Cons ===\n";
+		dtype.tstruct.cons.pCell->cdr = val;
 	}
 };
 
@@ -208,36 +243,35 @@ public:
 	Number() : Number(0) {}
 	Number(int64_t val) {
 		dtype.typeId = ETypeId::number;
-		dtype.block.init(sizeof(val));
-		memcpy(dtype.block.ptr, &val, sizeof(val));
+		dtype.tstruct.number = val;
 	}
-	int32_t getValue() {
-		return *reinterpret_cast<int32_t*>(dtype.block.ptr);
-	}
-};
-
-class PointerAtom : public Atom {
-	DynamicType dtype;
-public:
-	PointerAtom(Atom* val) {
-		dtype.typeId = ETypeId::pointerToAtom;
-		dtype.block.ptr = reinterpret_cast<uint8_t*>(val);
-	}
-	Atom* getValue() {
-		return reinterpret_cast<Atom*>(dtype.block.ptr);
+	int64_t getValue() {
+		return dtype.tstruct.number;
 	}
 };
 
-class PointerCons : public Atom {
-public:
-	PointerCons(Cons* val) {
-		dtype.typeId = ETypeId::pointerToCons;
-		dtype.block.ptr = reinterpret_cast<uint8_t*>(val);
-	}
-	Cons* getValue() {
-		return reinterpret_cast<Cons*>(dtype.block.ptr);
-	}
-};
+//class PointerAtom : public Atom {
+//	DynamicType dtype;
+//public:
+//	PointerAtom(Atom* val) {
+//		dtype.typeId = ETypeId::pointerToAtom;
+//		dtype.block.ptr = reinterpret_cast<uint8_t*>(val);
+//	}
+//	Atom* getValue() {
+//		return reinterpret_cast<Atom*>(dtype.block.ptr);
+//	}
+//};
+//
+//class PointerCons : public Atom {
+//public:
+//	PointerCons(Cons* val) {
+//		dtype.typeId = ETypeId::pointerToCons;
+//		dtype.block.ptr = reinterpret_cast<uint8_t*>(val);
+//	}
+//	Cons* getValue() {
+//		return reinterpret_cast<Cons*>(dtype.block.ptr);
+//	}
+//};
 
 class Nil : public Atom {
 public:
@@ -251,66 +285,58 @@ public:
 
 class Function : public Atom {
 	shared_ptr<LispFunction> func;
+	LispFunction& getFunc() {
+		return *dtype.tstruct.function.func;
+	}
+	IMemoryManager& getMemMan() {
+		return getGlobal().getMemoryManager();
+	}
 public:
 	Function(shared_ptr<LispFunction>& lispFunc) {
 		dtype.typeId = ETypeId::function;
-		func = lispFunc;
+		dtype.tstruct.function.func = lispFunc.get();
+		getMemMan().takeSharedPtrFunc(lispFunc.get(), lispFunc);
+		/*func = lispFunc;*/
 	}
-	shared_ptr<LispFunction> getValue() {
+	~Function() {
+		getMemMan().freeSharedPtrFunc(dtype.tstruct.function.func);
+	}
+	/*shared_ptr<LispFunction> getValue() {
 		return func;
+	}*/
+	LispFunction& getValue() {
+		return *dtype.tstruct.function.func;
 	}
 
 	void call(ArgsList& args, CallResult& result) {
-		getValue()->call(args, result);
+		LispFunction& fn = *(dtype.tstruct.function.func);
+		fn.call(args, result);
+		/*getValue().call(args, result);*/
 	}
 };
 
 class Symbol : public Atom {
-	struct SymbolStruct {
-		gstring name;
-		shared_ptr<Sexpr> bound;
-		shared_ptr<Sexpr> fbound;
-	};
-	unique_ptr<SymbolStruct> symData;
 public:
 	Symbol(gstring& name) {
 		dtype.typeId = ETypeId::symbol;
-		symData = make_unique<SymbolStruct>();
-		symData->name = name;
+		SymbolDesc*& symDesc = dtype.tstruct.symbol.symDesc;
+		symDesc = new SymbolDesc;
+		symDesc->name = name;
+	}
+	~Symbol() {
+		delete dtype.tstruct.symbol.symDesc;
 	}
 	shared_ptr<Sexpr> getValue() {
-		return symData->bound;
+		return dtype.tstruct.symbol.symDesc->bound;
 	}
 	shared_ptr<Sexpr> getFunction() {
-		return symData->fbound;
+		return dtype.tstruct.symbol.symDesc->fbound;
 	}
 	void setValue(shared_ptr<Sexpr> val) {
-		symData->bound = val;
+		dtype.tstruct.symbol.symDesc->bound = val;
 	}
 	void setFunction(shared_ptr<Function> func) {
 		// TODO Checking function 
-		symData->fbound = func;
+		dtype.tstruct.symbol.symDesc->fbound = func;
 	}
 };
-
-
-
-//class Cons : public ICons, CClass {
-//	shared_ptr<std::tuple<IAtom, IAtom>> cell;
-//public:
-//	bool isAtom() override {
-//		return false;
-//	}
-//	IAtom& car() override {
-//		return std::get<0>(*cell);
-//	}
-//	virtual IAtom& cdr() override {
-//		return std::get<1>(*cell);
-//	}
-//	void setCar(IAtom& val) override {
-//		std::get<0>(*cell) = val;
-//	}
-//	void setCdr(IAtom& val) override {
-//		std::get<1>(*cell) = val;
-//	}
-//};

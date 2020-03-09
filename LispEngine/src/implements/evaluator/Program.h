@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 #include <functional>
+#include <set>
+#include <map>
 
 #include "../../share.h"
 #include "../../interfaces/evaluator/IProgram.h"
@@ -10,9 +12,34 @@
 #include "../../interfaces/IDIBuilder.h"
 
 using std::vector;
+using std::set;
+using std::map;
 
-class MemoryManager : public IMemoryManager, CClass {
+class MemoryManager : public IMemoryManager, public CClass {
+	set<Cell*> cells;
+	map<LispFunction*, shared_ptr<LispFunction>> pfnMap;
+public:
+	virtual Cell* createCell() override {
+		Cell* pCell{ new Cell{} };
+		cells.insert(pCell);
+		return pCell;
+	};
 
+	virtual bool freeCell(Cell* pCell) override {
+		auto p = cells.find(pCell);
+		if (p != cells.end()) {
+			delete (*p);
+			return true;
+		}
+		return false;
+	}
+
+	virtual void takeSharedPtrFunc(LispFunction* func, shared_ptr<LispFunction>& pFunc) override {
+		pfnMap[func] = pFunc;
+	}
+	virtual void freeSharedPtrFunc(LispFunction* func) override {
+		pfnMap.erase(func);
+	}
 };
 
 //class Program : public IProgram, CClass {
@@ -55,17 +82,18 @@ class CallResult : public CClass {
 		To* newPtr = reinterpret_cast<To*>(ptr.release());
 		return std::shared_ptr< To >((Number*)(ptr));
 	}
-	PSexpr result_ptr;
+	
 	std::function<void()> deleter = nullptr;
 public:
+	PSexpr result;
 	void setResult(PSexpr sexpr, std::function<void()> deleter) {
-		result_ptr = sexpr;
+		result = sexpr;
 		this->deleter = deleter;
 	}
 	template<class ConcreteSexpr>
 	ConcreteSexpr& getResult() {
 		//return *reinterpret_cast<ConcreteSexpr*>(result_ptr);
-		return *reinterpret_cast<ConcreteSexpr*>(result_ptr.get());
+		return *reinterpret_cast<ConcreteSexpr*>(result.get());
 	}
 	~CallResult() {
 		if (deleter != nullptr) {

@@ -7,6 +7,11 @@ class IInterface {
 
 };
 
-class CClass {
+// Not fields
+class CBaseClass {
+
+};
+
+class CClass: public CBaseClass {
 
 };

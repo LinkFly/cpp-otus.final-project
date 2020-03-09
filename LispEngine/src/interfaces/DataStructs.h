@@ -48,3 +48,4 @@ class ICons : public ISexpr {
 };
 
 class LispFunction;
+class Cell;

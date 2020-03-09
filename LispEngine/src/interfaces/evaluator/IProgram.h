@@ -8,7 +8,11 @@
 using std::vector;
 
 class IMemoryManager : public IInterface {
-	/*virtual ICons createCell*/
+public:
+	virtual Cell* createCell() = 0;
+	virtual bool freeCell(Cell* pCell) = 0;
+	virtual void takeSharedPtrFunc(LispFunction* func, shared_ptr<LispFunction>& pFunc) = 0;
+	virtual void freeSharedPtrFunc(LispFunction* func) = 0;
 };
 
 class IProgramContext : public IInterface {
@@ -38,4 +42,7 @@ class LispFunctionBase : public CClass {
 class LispFunction : public LispFunctionBase {
 public:
 	virtual void call(ArgsList& args, CallResult& result) = 0;
+	virtual ~LispFunction() {
+
+	}
 };

@@ -30,9 +30,12 @@ using Cid = uint16_t;
 using gstring = std::string;
 using gchar = char;
 
+class IMemoryManager;
+class MemoryManager;
 class DIBuilder;
 class Sexpr;
 class LispFunction;
 class ArgsList;
 class CallResult;
 using PSexpr = shared_ptr<Sexpr>;
+class PlusLispFunction;
