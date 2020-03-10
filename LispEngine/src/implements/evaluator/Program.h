@@ -43,7 +43,7 @@ public:
 };
 
 class ArgsList : public CClass {
-	vector<shared_ptr<Sexpr>> args;
+	vector<PSexpr> args;
 public:
 	ArgsList() {
 		args.resize(0);
@@ -56,6 +56,9 @@ public:
 		args.resize(2);
 		args[0] = one;
 		args[1] = two;
+	}
+	void addArg(PSexpr& sexpr) {
+		args.push_back(sexpr);
 	}
 	shared_ptr<Sexpr> get(short_size argPos) {
 		return args[argPos];
@@ -140,6 +143,12 @@ public:
 	}
 	virtual shared_ptr<IProgramContext>& getProgramContext() override {
 		return context;
+	}
+
+	virtual PSexpr& createSymbol(const gstring& symName) override {
+		PSexpr symSexpr = diBuilder.createSymbol(symName);
+		getProgramContext()->getScope()->add(symName, symSexpr);
+		return symSexpr;
 	}
 };
 

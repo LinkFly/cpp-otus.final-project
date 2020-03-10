@@ -136,6 +136,9 @@ public:
 	bool isCons() {
 		return dtype.typeId == ETypeId::cons;
 	}
+	bool isSymbol() {
+		return dtype.typeId == ETypeId::symbol;
+	}
 };
 
 struct Cell {
@@ -194,6 +197,9 @@ class Nil : public Atom {
 public:
 	Nil() {
 		dtype.typeId = ETypeId::nil;
+	}
+	bool isTrueNil() {
+		return dtype.typeId == ETypeId::nil && getValue() == nullptr;
 	}
 	Cons* getValue() {
 		return nullptr;

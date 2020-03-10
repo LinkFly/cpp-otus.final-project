@@ -20,7 +20,7 @@ public:
 	virtual void add(const gstring& name, PSexpr& sexpr) override {
 		(*nsTable)[name] = sexpr;
 	}
-	virtual PSexpr& get(gstring& name) override {
+	virtual PSexpr& get(const gstring& name) override {
 		return (*nsTable)[name];
 	}
 	virtual shared_ptr<IScope> pushNewScope() override {

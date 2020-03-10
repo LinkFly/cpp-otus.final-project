@@ -130,4 +130,25 @@ public:
 	shared_ptr<PlusLispFunction> create<PlusLispFunction>() {
 		return make_shared<PlusLispFunction>();
 	}
+
+	template<>
+	shared_ptr<CarLispFunction> create<CarLispFunction>() {
+		return make_shared<CarLispFunction>();
+	}
+
+	template<>
+	shared_ptr<CdrLispFunction> create<CdrLispFunction>() {
+		return make_shared<CdrLispFunction>();
+	}
+
+	template<>
+	shared_ptr<SetqLispFunction> create<SetqLispFunction>() {
+		return make_shared<SetqLispFunction>();
+	}
+
+
+	template<>
+	shared_ptr<ConsLispFunction> create<ConsLispFunction>() {
+		return make_shared<ConsLispFunction>();
+	}
 };

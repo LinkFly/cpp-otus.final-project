@@ -13,11 +13,15 @@ set(HEADERS
 	src/Global.h
 	src/share.h
 	src/interfaces/evaluator/IProgram.h
+	src/interfaces/evaluator/IEvaluator.h
 	src/interfaces/DataStructs.h
-	src/implements/DataStructs.h
 	src/interfaces/IDIBuilder.h
-	src/implements/DIBuilder.h
 
+	src/BaseFunctions.h
+
+	src/implements/DataStructs.h
+	src/implements/evaluator/Evaluator.h
+	src/implements/DIBuilder.h
 
 	src/LispEngine.h
 	)

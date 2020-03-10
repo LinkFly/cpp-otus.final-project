@@ -9,30 +9,32 @@
 class Evaluator : public IEvaluator, CClass {
 	unique_ptr<CallResult> pLastResult;
 	virtual void evalForm(PSexpr& form, CallResult& callRes) override {
+		if (!form->isCons()) {
+			if (form->isSymbol()) {
+				auto sym = std::static_pointer_cast<Symbol>(form);
+				callRes.setResult(sym->getValue(), nullptr);
+				return;
+			}
+			callRes.setResult(form, nullptr);
+			return;
+		}
 		auto curCons = std::static_pointer_cast<Cons>(form);
 		auto curSym = std::static_pointer_cast<Symbol>(curCons->car());
-		auto nextCons = std::static_pointer_cast<Cons>(curCons->cdr());
-		auto firstArgSexpr = nextCons->car();
-		
-		if (firstArgSexpr->isCons()) {
-			CallResult locCallRes;
-			evalForm(firstArgSexpr, locCallRes);
-			firstArgSexpr = locCallRes.result;
+		auto nextSexpr = curCons->cdr();
+		ArgsList args{};
+		while (nextSexpr->isCons()) {
+			auto nextCons = std::static_pointer_cast<Cons>(nextSexpr);
+			auto nextArg = nextCons->car();
+			if (nextArg->isCons()) {
+				CallResult locCallRes;
+				evalForm(nextArg, locCallRes);
+				nextArg = locCallRes.result;
+			}
+			args.addArg(nextArg);
+			nextSexpr = nextCons->cdr();
 		}
-		auto firstArg = std::static_pointer_cast<Number>(firstArgSexpr);
-
-		auto nextCons2 = std::static_pointer_cast<Cons>(nextCons->cdr());
-		auto secondArgSexpr = nextCons2->car();
-		if (secondArgSexpr->isCons()) {
-			CallResult locCallRes;
-			evalForm(secondArgSexpr, locCallRes);
-			secondArgSexpr = locCallRes.result;
-		}
-		auto secondArg = std::static_pointer_cast<Number>(secondArgSexpr);
-
 		shared_ptr<Function> func = std::static_pointer_cast<Function>(curSym->getFunction());
-		ArgsList args2{ firstArg, secondArg };
-		func->call(args2, callRes);
+		func->call(args, callRes);
 	}
 public:
 	virtual void eval(IProgram& program) override {

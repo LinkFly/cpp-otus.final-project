@@ -19,15 +19,27 @@ class LispEngine : public CClass {
 	shared_ptr<IProgram> program = diBuilder.createProgram(idiBuilder);
 	shared_ptr<IEvaluator> evaluator = diBuilder.createEvaluator();
 	shared_ptr<SetfSymbolFunction> setfSymbolFunction = diBuilder.create<SetfSymbolFunction>();
-	PSexpr createSymbol(const gstring& symName) {
-		PSexpr symSexpr = diBuilder.createSymbol(symName);
-		program->getProgramContext()->getScope()->add(symName, symSexpr);
-		return symSexpr;
+
+public:
+	PSexpr& createSymbol(const gstring& symName) {
+		//PSexpr symSexpr = diBuilder.createSymbol(symName);
+		//program->getProgramContext()->getScope()->add(symName, symSexpr);
+		//return symSexpr;
+		return program->createSymbol(symName);
 	}
 
 	PSexpr& getSymbol(gstring& symName) {
-		return scope->get(symName);
+		/*return scope->get(symName);*/
+		return program->getProgramContext()->getScope()->get(symName);
 	}
+
+	PSexpr& getSymbolValue(const gstring& symName) {
+		/*return scope->get(symName);*/
+		auto sym = std::static_pointer_cast<Symbol>(
+			program->getProgramContext()->getScope()->get(symName));
+		return sym->getValue();
+	}
+
 	template<class TConcreteFunction>
 	void registerLispFunction(const gstring& symName) {
 		PSexpr symSexpr = createSymbol(symName);
@@ -41,10 +53,21 @@ class LispEngine : public CClass {
 		CallResult callRes;
 		setfSymbolFunction->call(args, callRes);
 	}
-public:
+
+	void registerSymbolValue(const gstring& symName, PSexpr& value) {
+		PSexpr symSexpr = createSymbol(symName);
+		shared_ptr<Symbol> sym = std::static_pointer_cast<Symbol>(symSexpr);
+		sym->setValue(value);
+	}
+
 	LispEngine() {
 		program->getProgramContext()->setScope(scope);
 		registerLispFunction<PlusLispFunction>("plus");
+		registerLispFunction<CarLispFunction>("car");
+		registerLispFunction<CdrLispFunction>("cdr");
+		registerLispFunction<ConsLispFunction>("cons");
+		registerLispFunction<SetqLispFunction>("setq");
+		//////
 
 	}
 	void readProgram(gstring& sProgram) {
@@ -62,6 +85,10 @@ public:
 	template<class ConcreteSexpr>
 	ConcreteSexpr& getLastResult() {
 		return evaluator->getLastResult().getResult<ConcreteSexpr>();
+	}
+
+	PSexpr& getLastPSexprRes() {
+		return evaluator->getLastResult().result;
 	}
 };
 

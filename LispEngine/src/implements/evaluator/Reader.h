@@ -157,6 +157,10 @@ class Reader : public IReader, public CClass {
 				}
 			}
 		}
+		// TODO refactor: remove repeat - almost as isWhitespace
+		if (ctx.state == ReadState::startToken) {
+			fnTokenReaded(ctx);
+		}
 	}
 
 	PSexpr parseNumber(gstring token, IProgram& program) {
@@ -168,9 +172,14 @@ public:
 
 	}
 
-	virtual PSexpr parseSymbol(gstring token, IProgram& program) override {
-		/*return diBuilder.createSymbol(token);*/
-		return program.getProgramContext()->getScope()->get(token);
+	virtual PSexpr& parseSymbol(gstring token, IProgram& program) override {
+		PSexpr& res = program.getProgramContext()->getScope()->get(token);
+		if (res.get() != nullptr) {
+			return res;
+		}
+		program.createSymbol(token);
+		res = program.getProgramContext()->getScope()->get(token);
+		return res;
 	}
 	
 	virtual void read(gstring& programText, IProgram& program) {
@@ -189,6 +198,10 @@ public:
 			}
 			else if (ctx.likeType == LikeType::symbol) {
 				cur = parseSymbol(ctx.curToken, program);
+				if (cur.get() == nullptr) {
+					cerr << "ERROR: Symbol `" << ctx.curToken << "` doesn't exists\n";
+					exit(-1);
+				}
 			}
 			if (!listStack.empty() && !elemsStack.empty()) {
 				shared_ptr<vector<PSexpr>> curElemsList = elemsStack.top();

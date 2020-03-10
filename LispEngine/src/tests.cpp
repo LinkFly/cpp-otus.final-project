@@ -76,6 +76,81 @@ bool nested_test() {
 		});
 }
 
+bool cons_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		int64_t waitFirst = 42;
+		int64_t waitSecond = 3;
+		lisp.readProgram(gstring{ "(cons 42 3)" });
+		lisp.evalProgram();
+		Cons& consRes = lisp.getLastResult<Cons>();
+		shared_ptr<Number> firstElt = std::static_pointer_cast<Number>(consRes.car());
+		bool isFirst = firstElt->getValue() == waitFirst;
+		shared_ptr<Number> secondElt = std::static_pointer_cast<Number>(consRes.cdr());
+		bool isSecond = secondElt->getValue() == waitSecond;
+		return isFirst && isSecond;
+		});
+}
+
+bool car_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		int64_t waitRes = 42;
+		lisp.readProgram(gstring{ "(car (cons 42 3))" });
+		lisp.evalProgram();
+		Number& numRes = lisp.getLastResult<Number>();
+		return  numRes.getValue() == waitRes;
+		});
+}
+
+bool cdr_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		int64_t waitRes = 3;
+		lisp.readProgram(gstring{ "(cdr (cons 42 3))" });
+		lisp.evalProgram();
+		Number& numRes = lisp.getLastResult<Number>();
+		return  numRes.getValue() == waitRes;
+		});
+}
+
+bool self_evaluated_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		int64_t waitRes = 42;
+		lisp.readProgram(gstring{ "42" });
+		lisp.evalProgram();
+		Number& numRes = lisp.getLastResult<Number>();
+		bool isCheckNum = numRes.getValue() == waitRes;
+
+		PSexpr& lastRes = lisp.getLastPSexprRes();
+		lisp.registerSymbolValue("test", lastRes);
+		lisp.readProgram(gstring{ "test" });
+		lisp.evalProgram();
+		Number& numRes2 = lisp.getLastResult<Number>();
+		bool isCheckSymVal = numRes2.getValue() == waitRes;
+		
+		return isCheckNum && isCheckSymVal;
+	});
+}
+
+bool setq_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		int64_t waitRes = 42;
+		lisp.readProgram(gstring{ "(setq test 42)" });
+		lisp.evalProgram();
+
+		Number& numRes = lisp.getLastResult<Number>();
+		bool isCheckReturn = numRes.getValue() == waitRes;
+
+		Sexpr* value = lisp.getSymbolValue("test").get();
+		bool isWaitedSymValue = (*value)._getDType().tstruct.number.num == waitRes;
+
+		return isCheckReturn && isWaitedSymValue;
+		});
+}
+
 void init_base_fixtures() {
 	// Init code must be here
 
@@ -96,6 +171,11 @@ BOOST_AUTO_TEST_CASE(test_of_lisp_engine)
 	BOOST_CHECK(trivial_test());
 	BOOST_CHECK(simple_test());
 	BOOST_CHECK(nested_test());
-
+	BOOST_CHECK(cons_test());
+	BOOST_CHECK(car_test());
+	BOOST_CHECK(cdr_test());
+	BOOST_CHECK(self_evaluated_test());
+	BOOST_CHECK(setq_test());
+	
 }
 BOOST_AUTO_TEST_SUITE_END()
