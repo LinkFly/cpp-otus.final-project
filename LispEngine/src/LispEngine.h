@@ -18,6 +18,7 @@ class LispEngine : public CClass {
 	shared_ptr<IScope> scope = diBuilder.createScope();
 	shared_ptr<IProgram> program = diBuilder.createProgram(idiBuilder);
 	shared_ptr<IEvaluator> evaluator = diBuilder.createEvaluator();
+	shared_ptr<IEvaluator> topLevelEvaluator = diBuilder.createEvaluator();
 	shared_ptr<SetfSymbolFunction> setfSymbolFunction = diBuilder.create<SetfSymbolFunction>();
 
 public:
@@ -44,20 +45,25 @@ public:
 	void registerLispFunction(const gstring& symName) {
 		PSexpr symSexpr = createSymbol(symName);
 
-		shared_ptr<LispFunction> plusLispFunction = diBuilder.create<TConcreteFunction>();
+		shared_ptr<ILispFunction> plusLispFunction = diBuilder.create<TConcreteFunction>();
 		shared_ptr<Function> plusFunction = diBuilder.createFunction(plusLispFunction);
 
 
 		PSexpr plusFuncSexpr = std::static_pointer_cast<Sexpr>(plusFunction);
 		ArgsList args(symSexpr, plusFuncSexpr);
 		CallResult callRes;
-		setfSymbolFunction->call(args, callRes);
+		setfSymbolFunction->call(*getGlobal().getTopLevelRunContext(), args, callRes);
 	}
 
 	void registerSymbolValue(const gstring& symName, PSexpr& value) {
 		PSexpr symSexpr = createSymbol(symName);
 		shared_ptr<Symbol> sym = std::static_pointer_cast<Symbol>(symSexpr);
 		sym->setValue(value);
+	}
+
+	void initTopLevelRunContext() {
+		shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*topLevelEvaluator);
+		getGlobal().setTopLevelRunContext(ctx);
 	}
 
 	LispEngine() {
@@ -67,6 +73,7 @@ public:
 		registerLispFunction<CdrLispFunction>("cdr");
 		registerLispFunction<ConsLispFunction>("cons");
 		registerLispFunction<SetqLispFunction>("setq");
+		registerLispFunction<QuoteLispFunction>("quote");
 		//////
 
 	}

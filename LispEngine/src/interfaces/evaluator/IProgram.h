@@ -11,8 +11,8 @@ class IMemoryManager : public IInterface {
 public:
 	virtual Cell* createCell() = 0;
 	virtual bool freeCell(Cell* pCell) = 0;
-	virtual void takeSharedPtrFunc(LispFunction* func, shared_ptr<LispFunction>& pFunc) = 0;
-	virtual void freeSharedPtrFunc(LispFunction* func) = 0;
+	virtual void takeSharedPtrFunc(ILispFunction* func, shared_ptr<ILispFunction>& pFunc) = 0;
+	virtual void freeSharedPtrFunc(ILispFunction* func) = 0;
 };
 
 class IProgramContext : public IInterface {
@@ -36,14 +36,21 @@ public:
 //class LispFunction;
 //class ArgsList;
 
-class LispFunctionBase : public CClass {
+class LispFunctionBase : public IInterface {
 
 };
 
-class LispFunction : public LispFunctionBase {
+class IRunContext: public IInterface {
 public:
-	virtual void call(ArgsList& args, CallResult& result) = 0;
-	virtual ~LispFunction() {
+	virtual void evalForm(PSexpr& sexpr, CallResult& callRes) = 0;
+};
+
+class ILispFunction : public LispFunctionBase {
+
+public:
+	//virtual LispFunction(IProgram)
+	virtual void call(IRunContext& ctx, ArgsList& args, CallResult& result) = 0;
+	virtual ~ILispFunction() {
 
 	}
 };

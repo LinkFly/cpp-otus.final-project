@@ -31,7 +31,7 @@ using std::map;
 using std::shared_ptr;
 using std::make_shared;
 
-class DIBuilder : public IDIBuilder, CClass {
+class DIBuilder : public IDIBuilder, public CClass {
 	//enum class EOpType {
 	//	bind, create
 	//};
@@ -94,7 +94,7 @@ public:
 		return make_shared<SetfSymbolFunction>();
 	}
 
-	shared_ptr<Function> createFunction(shared_ptr<LispFunction>& lispFunc) {
+	shared_ptr<Function> createFunction(shared_ptr<ILispFunction>& lispFunc) {
 		return make_shared<Function>(lispFunc);
 	}
 	
@@ -119,7 +119,11 @@ public:
 	}
 
 	shared_ptr<IEvaluator> createEvaluator() {
-		return std::dynamic_pointer_cast<IEvaluator>(make_shared<Evaluator>());
+		return std::dynamic_pointer_cast<IEvaluator>(make_shared<Evaluator>(*this));
+	}
+
+	virtual shared_ptr<IRunContext> createRunContext(IEvaluator& evaluator) override {
+		return std::dynamic_pointer_cast<IRunContext>(make_shared<RunContext>(evaluator));
 	}
 
 	/*shared_ptr<ILispEngine> createLispEngine() {
@@ -150,5 +154,10 @@ public:
 	template<>
 	shared_ptr<ConsLispFunction> create<ConsLispFunction>() {
 		return make_shared<ConsLispFunction>();
+	}
+
+	template<>
+	shared_ptr<QuoteLispFunction> create<QuoteLispFunction>() {
+		return make_shared<QuoteLispFunction>();
 	}
 };

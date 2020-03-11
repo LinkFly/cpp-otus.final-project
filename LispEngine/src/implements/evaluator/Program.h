@@ -17,7 +17,7 @@ using std::map;
 
 class MemoryManager : public IMemoryManager, public CClass {
 	set<Cell*> cells;
-	map<LispFunction*, shared_ptr<LispFunction>> pfnMap;
+	map<ILispFunction*, shared_ptr<ILispFunction>> pfnMap;
 public:
 	virtual Cell* createCell() override {
 		Cell* pCell{ new Cell{} };
@@ -34,11 +34,21 @@ public:
 		return false;
 	}
 
-	virtual void takeSharedPtrFunc(LispFunction* func, shared_ptr<LispFunction>& pFunc) override {
+	virtual void takeSharedPtrFunc(ILispFunction* func, shared_ptr<ILispFunction>& pFunc) override {
 		pfnMap[func] = pFunc;
 	}
-	virtual void freeSharedPtrFunc(LispFunction* func) override {
+	virtual void freeSharedPtrFunc(ILispFunction* func) override {
 		pfnMap.erase(func);
+	}
+};
+
+class RunContext : public IRunContext, public CClass {
+	IEvaluator& evaluator;
+public:
+	RunContext(IEvaluator& evaluator) : evaluator{ evaluator } {}
+
+	virtual void evalForm(PSexpr& sexpr, CallResult& callRes) override {
+		evaluator.evalForm(sexpr, callRes);
 	}
 };
 
@@ -92,13 +102,22 @@ public:
 	}
 };
 
+class LispFunction : public ILispFunction, public CClass {
+protected:
+	PSexpr evalArg(IRunContext& ctx, PSexpr& arg) {
+		CallResult locCallRes;
+		ctx.evalForm(arg, locCallRes);
+		return locCallRes.result;
+	}
+};
+
 class LispSetfFunction : public LispFunction {
 	//virtual void call(ArgsList& args, Sexpr& modifiable, CallResult& result) = 0;
 };
 
 class SetfSymbolFunction : public LispSetfFunction {
 public:
-	void call(ArgsList& args, CallResult& result) override {
+	void call(IRunContext& ctx, ArgsList& args, CallResult& result) override {
 		// TODO Checking types
 		shared_ptr<Symbol> symbol = std::static_pointer_cast<Symbol>(args.get(0));
 		shared_ptr<Function> function = std::static_pointer_cast<Function>(args.get(1));

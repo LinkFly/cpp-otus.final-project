@@ -4,6 +4,7 @@
 
 #include "../share.h"
 #include "../interfaces/evaluator/IScope.h"
+#include "../interfaces/evaluator/IEvaluator.h"
 #include "../implements/DataStructs.h"
 
 using std::shared_ptr;
@@ -32,9 +33,6 @@ public:
 
 	virtual shared_ptr<IProgramContext> createProgramContext() = 0;
 	virtual shared_ptr<IMemoryManager> createMemoryManager() = 0;
+	virtual shared_ptr<IRunContext> createRunContext(IEvaluator& evaluator) = 0;
+
 };
-
-
-
-
-

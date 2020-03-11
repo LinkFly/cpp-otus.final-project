@@ -184,7 +184,7 @@ public:
 	
 	virtual void read(gstring& programText, IProgram& program) {
 		/*sReaderContext ctx;*/
-		ReadTable table;
+		/*ReadTable table;*/
 		PSexpr resSexpr;
 		bool isListStarted = false;
 		vector<PSexpr> list{};

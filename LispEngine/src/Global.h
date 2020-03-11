@@ -10,6 +10,9 @@ public:
 	static const short_size typeIdBits = 4;
 	/*shared_ptr<DIBuilder> diBuilder;*/
 	shared_ptr<IMemoryManager> memoryManager;
+	shared_ptr<IRunContext> pRunContext;
+	shared_ptr<IRunContext> pTopLevelRunContext;
+	int* p;
 	Global() {
 		memoryManager = std::dynamic_pointer_cast<IMemoryManager>(make_shared<MemoryManager>());
 
@@ -21,9 +24,24 @@ public:
 	IMemoryManager& getMemoryManager() const {
 		return *memoryManager;
 	}
+
+	void setRunContext(shared_ptr<IRunContext>& ctx) {
+		pRunContext = ctx;
+	}
+	shared_ptr<IRunContext>& getRunContext() {
+		return this->pRunContext;
+	}
+
+	void setTopLevelRunContext(shared_ptr<IRunContext>& ctx) {
+		pTopLevelRunContext = ctx;
+	}
+	shared_ptr<IRunContext>& getTopLevelRunContext() {
+		return this->pTopLevelRunContext;
+	}
+
 };
 
-const Global& getGlobal() {
+Global& getGlobal() {
 	static Global global = Global{};
 	return global;
 }

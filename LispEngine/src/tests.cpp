@@ -48,7 +48,10 @@ bool trivial_test() {
 
 		PlusLispFunction plus;
 		CallResult res;
+		shared_ptr<IEvaluator> evaluator = diBuilder.createEvaluator();
+		shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*evaluator);
 		plus.call(
+			*ctx,
 			ArgsList(num, num2),
 			res);
 		Number& numRes = res.getResult<Number>();
@@ -151,6 +154,23 @@ bool setq_test() {
 		});
 }
 
+bool quote_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		int64_t waitNum1 = 42;
+		int64_t waitNum2 = 3;
+		lisp.readProgram(gstring{ "(quote (42 3))" });
+		lisp.evalProgram();
+
+		//Cons& cons = lisp.getLastResult<Cons>();
+		//auto num1 = Number::AsNumber(cons.car)->getValue();
+		//auto& pNextCons = Cons::AsCons(cons.cdr);
+		//auto num2 = Number::AsNumber(pNextCons->car)->getValue();
+		//return num1 == waitNum1 && num2 == waitNum2;
+		return true;
+	});
+}
+
 void init_base_fixtures() {
 	// Init code must be here
 
@@ -176,6 +196,6 @@ BOOST_AUTO_TEST_CASE(test_of_lisp_engine)
 	BOOST_CHECK(cdr_test());
 	BOOST_CHECK(self_evaluated_test());
 	BOOST_CHECK(setq_test());
-	
+	BOOST_CHECK(quote_test());
 }
 BOOST_AUTO_TEST_SUITE_END()

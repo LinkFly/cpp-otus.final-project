@@ -37,4 +37,6 @@ class Sexpr;
 class LispFunction;
 class ArgsList;
 class CallResult;
+class IRunContext;
 using PSexpr = shared_ptr<Sexpr>;
+

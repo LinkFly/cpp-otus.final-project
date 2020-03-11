@@ -106,7 +106,7 @@ struct CustomTypeStruct {
 };
 
 struct FunctionStruct {
-	LispFunction* func;
+	ILispFunction* func;
 };
 
 union TypeStruct {
@@ -141,7 +141,8 @@ public:
 	}
 };
 
-struct Cell {
+class Cell {
+public:
 	PSexpr car;
 	PSexpr cdr;
 };
@@ -156,6 +157,9 @@ class Cons : public Sexpr {
 		return global.getMemoryManager();
 	}
 public:
+	static shared_ptr<Cons>& AsCons(PSexpr& psexpr) {
+		return std::static_pointer_cast<Cons>(psexpr);
+	}
 	Cons(PSexpr& car, PSexpr& cdr) {
 		dtype.typeId = ETypeId::cons;
 		Cell*& pCell = dtype.tstruct.cons.pCell;
@@ -181,8 +185,10 @@ public:
 };
 
 class Number : public Atom {
-	
 public:
+	static shared_ptr<Number>& AsNumber(const PSexpr& psexpr) {
+		return std::static_pointer_cast<Number>(psexpr);
+	}
 	Number() : Number(0) {}
 	Number(int64_t val) {
 		dtype.typeId = ETypeId::number;
@@ -207,15 +213,19 @@ public:
 };
 
 class Function : public Atom {
-	shared_ptr<LispFunction> func;
-	LispFunction& getFunc() {
+	//shared_ptr<LispFunction> func;
+	ILispFunction& getFunc() {
 		return *dtype.tstruct.function.func;
 	}
 	IMemoryManager& getMemMan() {
 		return getGlobal().getMemoryManager();
 	}
+	shared_ptr<IRunContext>& getRunContext() {
+		auto global = getGlobal();
+		return global.getRunContext();
+	}
 public:
-	Function(shared_ptr<LispFunction>& lispFunc) {
+	Function(shared_ptr<ILispFunction>& lispFunc) {
 		dtype.typeId = ETypeId::function;
 		dtype.tstruct.function.func = lispFunc.get();
 		getMemMan().takeSharedPtrFunc(lispFunc.get(), lispFunc);
@@ -224,13 +234,13 @@ public:
 		getMemMan().freeSharedPtrFunc(dtype.tstruct.function.func);
 	}
 
-	LispFunction& getValue() {
+	ILispFunction& getValue() {
 		return *dtype.tstruct.function.func;
 	}
 
 	void call(ArgsList& args, CallResult& result) {
-		LispFunction& fn = *(dtype.tstruct.function.func);
-		fn.call(args, result);
+		ILispFunction& fn = *(dtype.tstruct.function.func);
+		fn.call(*getRunContext(), args, result);
 	}
 };
 
@@ -255,7 +265,7 @@ public:
 		dtype.tstruct.symbol.symDesc->bound = val;
 	}
 	void setFunction(shared_ptr<Function> func) {
-		// TODO Checking function 
+		// TODO Checking function
 		dtype.tstruct.symbol.symDesc->fbound = func;
 	}
 };

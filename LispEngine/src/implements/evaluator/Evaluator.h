@@ -4,10 +4,14 @@
 
 #include "../../share.h"
 #include "../../interfaces/evaluator/IProgram.h"
+#include "../../interfaces/IDiBuilder.h"
 //#include "../../implements/DiBuilder.h"
 
-class Evaluator : public IEvaluator, CClass {
+class Evaluator : public IEvaluator, public CClass {
 	unique_ptr<CallResult> pLastResult;
+	IDIBuilder& diBuilder;
+public:
+	Evaluator(IDIBuilder& diBuilder) : diBuilder{ diBuilder } {}
 	virtual void evalForm(PSexpr& form, CallResult& callRes) override {
 		if (!form->isCons()) {
 			if (form->isSymbol()) {
@@ -25,25 +29,31 @@ class Evaluator : public IEvaluator, CClass {
 		while (nextSexpr->isCons()) {
 			auto nextCons = std::static_pointer_cast<Cons>(nextSexpr);
 			auto nextArg = nextCons->car();
-			if (nextArg->isCons()) {
+			/*if (nextArg->isCons()) {
 				CallResult locCallRes;
 				evalForm(nextArg, locCallRes);
 				nextArg = locCallRes.result;
-			}
+			}*/
 			args.addArg(nextArg);
 			nextSexpr = nextCons->cdr();
 		}
 		shared_ptr<Function> func = std::static_pointer_cast<Function>(curSym->getFunction());
 		func->call(args, callRes);
 	}
-public:
+
+	void createRunContext() {
+		shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*this);
+		getGlobal().setRunContext(ctx);
+	}
+
 	virtual void eval(IProgram& program) override {
+		createRunContext();
 		for (PSexpr& form : program.getProgramForms()) {
 			pLastResult.swap(make_unique<CallResult>());
 			evalForm(form, *pLastResult.get());
 		}
 	}
-	
+
 	virtual CallResult& getLastResult() override {
 		return *pLastResult.get();
 	}

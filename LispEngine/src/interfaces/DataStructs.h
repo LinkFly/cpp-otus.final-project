@@ -47,5 +47,5 @@ class ICons : public ISexpr {
 	virtual void setCdr(IAtom& val) = 0;
 };
 
-class LispFunction;
+class ILispFunction;
 class Cell;
