@@ -160,4 +160,9 @@ public:
 	shared_ptr<QuoteLispFunction> create<QuoteLispFunction>() {
 		return make_shared<QuoteLispFunction>();
 	}
+
+	template<>
+	shared_ptr<IfLispFunction> create<IfLispFunction>() {
+		return make_shared<IfLispFunction>();
+	}
 };

@@ -16,7 +16,13 @@ public:
 		if (!form->isCons()) {
 			if (form->isSymbol()) {
 				auto sym = std::static_pointer_cast<Symbol>(form);
-				callRes.setResult(sym->getValue(), nullptr);
+				if (sym->getSelfEval()) {
+					callRes.setResult(sym, nullptr);
+				}
+				else {
+					callRes.setResult(sym->getValue(), nullptr);
+				}
+				
 				return;
 			}
 			callRes.setResult(form, nullptr);

@@ -132,8 +132,13 @@ bool self_evaluated_test() {
 		lisp.evalProgram();
 		Number& numRes2 = lisp.getLastResult<Number>();
 		bool isCheckSymVal = numRes2.getValue() == waitRes;
+
+		lisp.readProgram(gstring{ "t" });
+		lisp.evalProgram();
+		Symbol& symT = lisp.getLastResult<Symbol>();
+		bool isTrue = symT.getName() == gstring{ "t" };
 		
-		return isCheckNum && isCheckSymVal;
+		return isCheckNum && isCheckSymVal && isTrue;
 	});
 }
 
@@ -162,13 +167,52 @@ bool quote_test() {
 		lisp.readProgram(gstring{ "(quote (42 3))" });
 		lisp.evalProgram();
 
-		//Cons& cons = lisp.getLastResult<Cons>();
-		//auto num1 = Number::AsNumber(cons.car)->getValue();
-		//auto& pNextCons = Cons::AsCons(cons.cdr);
-		//auto num2 = Number::AsNumber(pNextCons->car)->getValue();
-		//return num1 == waitNum1 && num2 == waitNum2;
-		return true;
+		Cons& cons = lisp.getLastResult<Cons>();
+		//Number& sexprNum = *Number::AsNumber(cons.car());
+		Number* pNum = Number::AsNumber(cons.car()).get();
+		auto num1 = pNum->getValue();
+		Cons* pNextCons = Cons::AsCons(cons.cdr()).get();
+		Number* pNum2 = Number::AsNumber(pNextCons->car()).get();
+		auto num2 = pNum2->getValue();
+		return num1 == waitNum1 && num2 == waitNum2;
 	});
+}
+
+bool if_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		bool isSingleT, isSingleNil, isNestedT, isNestedNil;
+		{
+			int64_t waitNum1 = 1;
+			int64_t waitNum2 = 2;
+			lisp.readProgram(gstring{ "(if t 1 2)" });
+			lisp.evalProgram();
+			Number& num1 = lisp.getLastResult<Number>();
+			isSingleT = num1.getValue() == waitNum1;
+
+			lisp.readProgram(gstring{ "(if nil 1 2)" });
+			lisp.evalProgram();
+			Number& num2 = lisp.getLastResult<Number>();
+			isSingleNil = num2.getValue() == waitNum2;
+		}
+
+		{
+			int64_t waitNum1 = 5;
+			int64_t waitNum2 = 12;
+			lisp.readProgram(gstring{ "(if t (plus 2 3) (plus 7 5))" });
+			lisp.evalProgram();
+			Number& num1 = lisp.getLastResult<Number>();
+			isNestedT = num1.getValue() == waitNum1;
+
+			lisp.readProgram(gstring{ "(if nil (plus 2 3) (plus 7 5))" });
+			lisp.evalProgram();
+			Number& num2 = lisp.getLastResult<Number>();
+			isNestedNil = num2.getValue() == waitNum2;
+		}
+
+		/*return isSingleT && isSingleNil;*/
+		return isSingleT && isSingleNil && isNestedT && isNestedNil;
+		});
 }
 
 void init_base_fixtures() {
@@ -197,5 +241,6 @@ BOOST_AUTO_TEST_CASE(test_of_lisp_engine)
 	BOOST_CHECK(self_evaluated_test());
 	BOOST_CHECK(setq_test());
 	BOOST_CHECK(quote_test());
+	BOOST_CHECK(if_test());
 }
 BOOST_AUTO_TEST_SUITE_END()

@@ -93,3 +93,15 @@ public:
 		res.setResult(oneArg, nullptr);
 	}
 };
+
+class IfLispFunction : public LispFunction {
+public:
+	void call(IRunContext& ctx, ArgsList& args, CallResult& res) override {
+		auto oneArg = args.get(0);
+		oneArg = evalArg(ctx, oneArg);
+		bool bIsTrue = !oneArg->isNil();
+		auto nextArg = args.get(bIsTrue ? 1 : 2);
+		nextArg = evalArg(ctx, nextArg);
+		res.setResult(nextArg, nullptr);
+	}
+};

@@ -94,6 +94,7 @@ struct SymbolDesc {
 	gstring name;
 	shared_ptr<Sexpr> bound;
 	shared_ptr<Sexpr> fbound;
+	bool bIsSelfEvaluated = false;
 };
 
 struct SymbolStruct {
@@ -138,6 +139,9 @@ public:
 	}
 	bool isSymbol() {
 		return dtype.typeId == ETypeId::symbol;
+	}
+	bool isNil() {
+		return dtype.typeId == ETypeId::nil;
 	}
 };
 
@@ -255,6 +259,9 @@ public:
 	~Symbol() {
 		delete dtype.tstruct.symbol.symDesc;
 	}
+	const gstring& getName() {
+		return dtype.tstruct.symbol.symDesc->name;
+	}
 	shared_ptr<Sexpr> getValue() {
 		return dtype.tstruct.symbol.symDesc->bound;
 	}
@@ -267,5 +274,14 @@ public:
 	void setFunction(shared_ptr<Function> func) {
 		// TODO Checking function
 		dtype.tstruct.symbol.symDesc->fbound = func;
+	}
+	void setSelfEval() {
+		dtype.tstruct.symbol.symDesc->bIsSelfEvaluated = true;
+	}
+	bool unsetSelfEval() {
+		dtype.tstruct.symbol.symDesc->bIsSelfEvaluated = false;
+	}
+	bool getSelfEval() {
+		return dtype.tstruct.symbol.symDesc->bIsSelfEvaluated;
 	}
 };

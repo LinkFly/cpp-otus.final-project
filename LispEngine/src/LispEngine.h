@@ -20,6 +20,7 @@ class LispEngine : public CClass {
 	shared_ptr<IEvaluator> evaluator = diBuilder.createEvaluator();
 	shared_ptr<IEvaluator> topLevelEvaluator = diBuilder.createEvaluator();
 	shared_ptr<SetfSymbolFunction> setfSymbolFunction = diBuilder.create<SetfSymbolFunction>();
+	shared_ptr<Nil> nil = diBuilder.createNil();
 
 public:
 	PSexpr& createSymbol(const gstring& symName) {
@@ -61,6 +62,21 @@ public:
 		sym->setValue(value);
 	}
 
+	void registerSymbolSelfEvaluated(const gstring& symName) {
+		PSexpr symSexpr = createSymbol(symName);
+		shared_ptr<Symbol> sym = std::static_pointer_cast<Symbol>(symSexpr);
+		sym->setSelfEval();
+		/*PSexpr symSexpr = createSymbol(symName);
+		shared_ptr<Symbol> sym = std::static_pointer_cast<Symbol>(symSexpr);
+		sym->setValue(symSexpr);*/
+		//shared_ptr<Nil> pnil = diBuilder.createNil();
+		////auto nil = *pnil;
+		//registerSymbolValue(symName, *pnil);
+		//PSexpr& symSexpr = createSymbol(symName);
+		//std::static_pointer_cast<Symbol>(symSexpr)->setValue(symSexpr);
+		////sym->setValue(symSexpr);
+	}
+
 	void initTopLevelRunContext() {
 		shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*topLevelEvaluator);
 		getGlobal().setTopLevelRunContext(ctx);
@@ -74,8 +90,11 @@ public:
 		registerLispFunction<ConsLispFunction>("cons");
 		registerLispFunction<SetqLispFunction>("setq");
 		registerLispFunction<QuoteLispFunction>("quote");
+		registerLispFunction<IfLispFunction>("if");
 		//////
 
+		registerSymbolSelfEvaluated("t");
+		registerSymbolValue("nil", std::static_pointer_cast<Sexpr>(nil));
 	}
 	void readProgram(gstring& sProgram) {
 		reader->read(sProgram, *program.get());
