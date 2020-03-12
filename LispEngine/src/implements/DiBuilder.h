@@ -165,4 +165,9 @@ public:
 	shared_ptr<IfLispFunction> create<IfLispFunction>() {
 		return make_shared<IfLispFunction>();
 	}
+
+	template<>
+	shared_ptr<LetLispFunction> create<LetLispFunction>() {
+		return make_shared<LetLispFunction>();
+	}
 };

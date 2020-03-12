@@ -91,6 +91,7 @@ public:
 		registerLispFunction<SetqLispFunction>("setq");
 		registerLispFunction<QuoteLispFunction>("quote");
 		registerLispFunction<IfLispFunction>("if");
+		registerLispFunction<LetLispFunction>("let");
 		//////
 
 		registerSymbolSelfEvaluated("t");

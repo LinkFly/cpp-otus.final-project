@@ -105,3 +105,27 @@ public:
 		res.setResult(nextArg, nullptr);
 	}
 };
+
+class LetLispFunction : public LispFunction {
+public:
+	void call(IRunContext& ctx, ArgsList& args, CallResult& res) override {
+		auto oneArg = args.get(0); // not evaluted
+		// push new scope
+		// ...
+		// working with scope
+		// ...
+		if (args.size() > 1) {
+			PSexpr nextArg;
+			for (size_t i = 1; i < args.size(); ++i) {
+				nextArg = args.get(i);
+				nextArg = evalArg(ctx, nextArg);
+			}
+			res.setResult(nextArg, nullptr);
+			return;
+		}
+		// TODO use diBuilder
+		res.setResult(make_shared<Nil>(), nullptr);
+		// restore scope
+		// ...
+	}
+};

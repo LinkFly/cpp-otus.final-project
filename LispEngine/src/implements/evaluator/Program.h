@@ -73,6 +73,9 @@ public:
 	shared_ptr<Sexpr> get(short_size argPos) {
 		return args[argPos];
 	}
+	size_t size() {
+		return args.size();
+	}
 };
 
 // Warning! Maybe memory leak
