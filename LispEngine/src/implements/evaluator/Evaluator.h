@@ -8,11 +8,11 @@
 //#include "../../implements/DiBuilder.h"
 
 class Evaluator : public IEvaluator, public CClass {
-	unique_ptr<CallResult> pLastResult;
+	shared_ptr<ICallResult> pLastResult;
 	IDIBuilder& diBuilder;
 public:
 	Evaluator(IDIBuilder& diBuilder) : diBuilder{ diBuilder } {}
-	virtual void evalForm(PSexpr& form, CallResult& callRes) override {
+	virtual void evalForm(PSexpr& form, ICallResult& callRes) override {
 		if (!form->isCons()) {
 			if (form->isSymbol()) {
 				auto sym = std::static_pointer_cast<Symbol>(form);
@@ -51,16 +51,25 @@ public:
 		shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*this);
 		getGlobal().setRunContext(ctx);
 	}
+	shared_ptr<IRunContext>& getRunContext() {
+		return getGlobal().getRunContext();
+	}
 
-	virtual void eval(IProgram& program) override {
+	virtual void eval(IProgram& program, ErrorCallback onErrorCallback = nullptr) override {
 		createRunContext();
+		getRunContext()->setOnErrorCallback(onErrorCallback);
+		getRunContext()->setDIBuilder(&diBuilder);
 		for (PSexpr& form : program.getProgramForms()) {
-			pLastResult.swap(make_unique<CallResult>());
+			/*shared_ptr<ICallResult> pCallRes = 
+				std::static_pointer_cast<ICallResult>(make_shared<CallResult>());*/
+			auto pCallRes = diBuilder.createCallResult();
+			//shared_ptr<ICallResult> pCallRes;
+			pLastResult.swap(pCallRes);
 			evalForm(form, *pLastResult.get());
 		}
 	}
 
-	virtual CallResult& getLastResult() override {
+	virtual ICallResult& getLastResult() override {
 		return *pLastResult.get();
 	}
 };

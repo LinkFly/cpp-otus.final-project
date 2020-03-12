@@ -32,11 +32,21 @@ using gchar = char;
 
 class IMemoryManager;
 class MemoryManager;
+class IDIBuilder;
 class DIBuilder;
 class Sexpr;
 class LispFunction;
 class ArgsList;
-class CallResult;
+class ICallResult;
 class IRunContext;
+class Error;
+class ErrorHandling;
 using PSexpr = shared_ptr<Sexpr>;
+
+// Enums
+enum class EResultStatus {
+	unknown, success, error
+};
+
+
 

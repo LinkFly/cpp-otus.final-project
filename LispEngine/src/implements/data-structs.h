@@ -5,7 +5,10 @@
 
 #include "../share.h"
 #include "../interfaces/evaluator/IProgram.h"
-#include "../interfaces/DataStructs.h"
+#include "../interfaces/evaluator/IRunContext.h"
+#include "../interfaces/evaluator/ICallResult.h"
+
+#include "../interfaces/i-data-structs.h"
 
 using std::unique_ptr;
 
@@ -143,6 +146,15 @@ public:
 	bool isNil() {
 		return dtype.typeId == ETypeId::nil;
 	}
+	bool isNumber() {
+		return dtype.typeId == ETypeId::number;
+	}
+	bool isFunction() {
+		return dtype.typeId == ETypeId::function;
+	}
+	bool isCustom() {
+		return dtype.typeId == ETypeId::custom;
+	}
 };
 
 class Cell {
@@ -190,7 +202,7 @@ public:
 
 class Number : public Atom {
 public:
-	static shared_ptr<Number>& AsNumber(const PSexpr& psexpr) {
+	static shared_ptr<Number>& AsNumber(const PSexpr psexpr) {
 		return std::static_pointer_cast<Number>(psexpr);
 	}
 	Number() : Number(0) {}
@@ -242,9 +254,22 @@ public:
 		return *dtype.tstruct.function.func;
 	}
 
-	void call(ArgsList& args, CallResult& result) {
+	void call(ArgsList& args, ICallResult& result) {
 		ILispFunction& fn = *(dtype.tstruct.function.func);
 		fn.call(*getRunContext(), args, result);
+		if (result.getStatus() != EResultStatus::success) {
+			if (result.getStatus() == EResultStatus::unknown) {
+				error("unknown operation status");
+				return;
+			}
+			if (result.getStatus() == EResultStatus::error) {
+				getGlobal().getRunContext()->getOnErrorCallback();
+			}
+			else {
+				error("Not implemented handling for this operation status");
+			}
+			return;
+		}
 	}
 };
 

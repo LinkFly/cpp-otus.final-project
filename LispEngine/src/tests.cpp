@@ -54,7 +54,7 @@ bool trivial_test() {
 			*ctx,
 			ArgsList(num, num2),
 			res);
-		Number& numRes = res.getResult<Number>();
+		Number& numRes = res.getConcreteResult<Number>();
 		return numRes.getValue() == waitRes;
 	});
 }

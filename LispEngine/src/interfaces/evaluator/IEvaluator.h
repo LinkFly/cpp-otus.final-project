@@ -5,7 +5,9 @@
 
 class IEvaluator : public IInterface {
 public:
-	virtual void evalForm(PSexpr& form, CallResult& callRes) = 0;
-	virtual void eval(IProgram& program) = 0;
-	virtual CallResult& getLastResult() = 0;
+	virtual void evalForm(PSexpr& form, ICallResult& callRes) = 0;
+	virtual void eval(IProgram& program, ErrorCallback onErrorCallback) = 0;
+	virtual ICallResult& getLastResult() = 0;
+	/*virtual void setRepl(Repl& repl) = 0;
+	virtual Repl& getRepl() = 0;*/
 };

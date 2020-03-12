@@ -9,19 +9,28 @@
 #include "../share.h"
 #include "../interfaces/IDIBuilder.h"
 
-#include "../interfaces/DataStructs.h"
+#include "../interfaces/i-data-structs.h"
 #include "../interfaces/evaluator/IScope.h"
 #include "../interfaces/evaluator/IReader.h"
 #include "../interfaces/evaluator/IProgram.h"
 #include "../interfaces/evaluator/IEvaluator.h"
+#include "../interfaces/evaluator/IRunContext.h"
+#include "../interfaces/evaluator/ICallResult.h"
 
-#include "../implements/DataStructs.h"
-#include "../implements/evaluator/Program.h";
-#include "../implements/evaluator/Scope.h";
-#include "../implements/evaluator/Reader.h";
-#include "../implements/evaluator/Program.h";
-#include "../implements/evaluator/Evaluator.h";
+#include "../interfaces/ILispEngine.h"
+
+#include "../implements/data-structs.h"
+#include "../implements/evaluator/Program.h"
+#include "../implements/evaluator/Scope.h"
+#include "../implements/evaluator/Reader.h"
+#include "../implements/evaluator/Program.h"
+#include "../implements/evaluator/Evaluator.h"
+#include "../implements/evaluator/RunContext.h"
+#include "../implements/evaluator/CallResult.h"
+
 #include "../BaseFunctions.h"
+#include "../Printer.h"
+#include "../repl.h"
 
 // test
 #include "../test.h"
@@ -123,8 +132,28 @@ public:
 	}
 
 	virtual shared_ptr<IRunContext> createRunContext(IEvaluator& evaluator) override {
-		return std::dynamic_pointer_cast<IRunContext>(make_shared<RunContext>(evaluator));
+		auto res = std::dynamic_pointer_cast<IRunContext>(make_shared<RunContext>(evaluator));
+		res->setDIBuilder(this);
+		return res;
 	}
+
+	virtual shared_ptr<Printer> createPrinter() {
+		return make_shared<Printer>();
+		//return std::dynamic_pointer_cast<IRunContext>(make_shared<RunContext>(evaluator));
+	}
+
+	virtual shared_ptr<Repl> createRepl(ILispEngine& lispEngine) {
+		return make_shared<Repl>(lispEngine);
+		//return std::dynamic_pointer_cast<IRunContext>(make_shared<RunContext>(evaluator));
+	}
+
+	virtual shared_ptr<ICallResult> createCallResult() override {
+		/*shared_ptr<ICallResult> ptr;
+		return ptr;*/
+		//return shared_ptr<ICallResult>();
+		return std::dynamic_pointer_cast<ICallResult>(make_shared<CallResult>());
+	}
+
 
 	/*shared_ptr<ILispEngine> createLispEngine() {
 		return std::dynamic_pointer_cast<ILispEngine>(make_shared<LispEngine>());

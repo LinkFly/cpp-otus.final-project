@@ -1,17 +1,19 @@
 ﻿#pragma once
 
 #include "share.h"
-#include "interfaces/DataStructs.h"
+#include "interfaces/i-data-structs.h"
 
 #include "implements/DiBuilder.h"
-#include "interfaces/DataStructs.h"
+#include "interfaces/i-data-structs.h"
 #include "interfaces/evaluator/IScope.h"
 #include "interfaces/evaluator/IProgram.h"
+#include "interfaces/ILispEngine.h"
 
 #include "implements/evaluator/Program.h"
 #include "BaseFunctions.h"
+#include "Printer.h"
 
-class LispEngine : public CClass {
+class LispEngine : public ILispEngine, public CClass {
 	DIBuilder diBuilder;
 	IDIBuilder& idiBuilder = *(dynamic_cast<IDIBuilder*>(&diBuilder));
 	shared_ptr<IReader> reader = diBuilder.createReader(idiBuilder);
@@ -21,8 +23,14 @@ class LispEngine : public CClass {
 	shared_ptr<IEvaluator> topLevelEvaluator = diBuilder.createEvaluator();
 	shared_ptr<SetfSymbolFunction> setfSymbolFunction = diBuilder.create<SetfSymbolFunction>();
 	shared_ptr<Nil> nil = diBuilder.createNil();
+	shared_ptr<Printer> printer = diBuilder.createPrinter();
+	shared_ptr<Repl> repl = diBuilder.createRepl(*this);
+	ErrorCallback errCallback;
 
 public:
+	ErrorCallback& getErrorCallback() {
+		return errCallback;
+	}
 	PSexpr& createSymbol(const gstring& symName) {
 		//PSexpr symSexpr = diBuilder.createSymbol(symName);
 		//program->getProgramContext()->getScope()->add(symName, symSexpr);
@@ -52,8 +60,8 @@ public:
 
 		PSexpr plusFuncSexpr = std::static_pointer_cast<Sexpr>(plusFunction);
 		ArgsList args(symSexpr, plusFuncSexpr);
-		CallResult callRes;
-		setfSymbolFunction->call(*getGlobal().getTopLevelRunContext(), args, callRes);
+		shared_ptr<ICallResult> callRes = diBuilder.createCallResult();
+		setfSymbolFunction->call(*getGlobal().getTopLevelRunContext(), args, *callRes);
 	}
 
 	void registerSymbolValue(const gstring& symName, PSexpr& value) {
@@ -79,10 +87,12 @@ public:
 
 	void initTopLevelRunContext() {
 		shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*topLevelEvaluator);
+		ctx->setDIBuilder(&diBuilder);
 		getGlobal().setTopLevelRunContext(ctx);
 	}
 
 	LispEngine() {
+		/*repl = diBuilder.createRepl(*this);*/
 		program->getProgramContext()->setScope(scope);
 		registerLispFunction<PlusLispFunction>("plus");
 		registerLispFunction<CarLispFunction>("car");
@@ -96,6 +106,14 @@ public:
 
 		registerSymbolSelfEvaluated("t");
 		registerSymbolValue("nil", std::static_pointer_cast<Sexpr>(nil));
+
+		errCallback = [](Error& err) {
+			cerr << err.message << endl;
+		};
+
+		initTopLevelRunContext();
+		getGlobal().getTopLevelRunContext()->setOnErrorCallback(errCallback);
+		
 	}
 	void readProgram(gstring& sProgram) {
 		reader->read(sProgram, *program.get());
@@ -106,16 +124,29 @@ public:
 	}
 
 	void evalProgram() {
-		evaluator->eval(*program.get());
+		evaluator->eval(*program.get(), [](Error& err) {
+			cerr << "[ERROR]: " << err.message << endl;
+			});
 	}
 
 	template<class ConcreteSexpr>
 	ConcreteSexpr& getLastResult() {
-		return evaluator->getLastResult().getResult<ConcreteSexpr>();
+		auto result = evaluator->getLastResult().getResult();
+		return *reinterpret_cast<ConcreteSexpr*>(result.get());
 	}
 
 	PSexpr& getLastPSexprRes() {
-		return evaluator->getLastResult().result;
+		return evaluator->getLastResult().getResult();
+	}
+
+	gstring evalSexprStr(gstring& sexprStr) override {
+		readProgram(sexprStr);
+		evalProgram();
+		return (*printer)(getLastPSexprRes());
+	}
+
+	void runRepl() {
+		repl->run(getGlobal().getTopLevelRunContext());
 	}
 };
 

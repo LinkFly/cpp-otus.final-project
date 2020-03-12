@@ -1,7 +1,10 @@
 ﻿#pragma once
 
+#include "../share.h"
+
 #include <tuple>
 #include <memory>
+
 
 using std::tuple;
 using std::shared_ptr;

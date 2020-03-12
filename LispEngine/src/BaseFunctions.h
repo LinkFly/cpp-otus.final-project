@@ -1,15 +1,26 @@
 #pragma once
 
 #include "share.h"
+
+//
+
 //#include "interfaces/evaluator/IProgram.h"
+#include "interfaces/evaluator/IRunContext.h"
+#include "interfaces/evaluator/ICallResult.h"
+
 #include "implements/evaluator/Program.h"
 
 class PlusLispFunction : public LispFunction {
 public:
-	void call(IRunContext& ctx, ArgsList& args, CallResult& res) override {
+	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		PSexpr arg1 = args.get(0);
 		arg1 = evalArg(ctx, arg1);
 		auto oneArg = reinterpret_cast<Number*>(arg1.get());
+		if (oneArg == nullptr) {
+			auto error = make_shared<ErrorBadArg>();
+			res.setErrorResult(error);
+			return;
+		}
 		PSexpr arg2 = args.get(1);
 		arg2 = evalArg(ctx, arg2);
 		auto twoArg = reinterpret_cast<Number*>(arg2.get());
@@ -29,7 +40,7 @@ public:
 
 class CarLispFunction : public LispFunction {
 public:
-	void call(IRunContext& ctx, ArgsList& args, CallResult& res) override {
+	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto arg1 = args.get(0);
 		arg1 = evalArg(ctx, arg1);
 		auto oneArg = arg1.get();
@@ -43,7 +54,7 @@ public:
 
 class CdrLispFunction : public LispFunction {
 public:
-	void call(IRunContext& ctx, ArgsList& args, CallResult& res) override {
+	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto arg1 = args.get(0);
 		arg1 = evalArg(ctx, arg1);
 		auto oneArg = arg1.get();
@@ -57,7 +68,7 @@ public:
 
 class ConsLispFunction : public LispFunction {
 public:
-	void call(IRunContext& ctx, ArgsList& args, CallResult& res) override {
+	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto oneArg = args.get(0);
 		oneArg = evalArg(ctx, oneArg);
 		auto twoArg = args.get(1);
@@ -72,7 +83,7 @@ public:
 
 class SetqLispFunction : public LispFunction {
 public:
-	void call(IRunContext& ctx, ArgsList& args, CallResult& res) override {
+	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto oneArg = args.get(0); // not evaluated
 		auto twoArg = args.get(1);
 		twoArg = evalArg(ctx, twoArg);
@@ -88,7 +99,7 @@ public:
 
 class QuoteLispFunction : public LispFunction {
 public:
-	void call(IRunContext& ctx, ArgsList& args, CallResult& res) override {
+	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto oneArg = args.get(0);
 		res.setResult(oneArg, nullptr);
 	}
@@ -96,7 +107,7 @@ public:
 
 class IfLispFunction : public LispFunction {
 public:
-	void call(IRunContext& ctx, ArgsList& args, CallResult& res) override {
+	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto oneArg = args.get(0);
 		oneArg = evalArg(ctx, oneArg);
 		bool bIsTrue = !oneArg->isNil();
@@ -108,7 +119,7 @@ public:
 
 class LetLispFunction : public LispFunction {
 public:
-	void call(IRunContext& ctx, ArgsList& args, CallResult& res) override {
+	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto oneArg = args.get(0); // not evaluted
 		// push new scope
 		// ...
@@ -116,7 +127,7 @@ public:
 		// ...
 		if (args.size() > 1) {
 			PSexpr nextArg;
-			for (size_t i = 1; i < args.size(); ++i) {
+			for (short_size i = 1; i < args.size(); ++i) {
 				nextArg = args.get(i);
 				nextArg = evalArg(ctx, nextArg);
 			}

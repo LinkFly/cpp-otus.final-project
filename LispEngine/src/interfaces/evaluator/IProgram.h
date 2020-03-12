@@ -3,7 +3,9 @@
 #include <vector>
 
 #include "../../share.h"
-#include "../DataStructs.h"
+#include "../i-data-structs.h"
+#include "../../errors.h"
+#include "../evaluator/ICallResult.h"
 
 using std::vector;
 
@@ -40,16 +42,11 @@ class LispFunctionBase : public IInterface {
 
 };
 
-class IRunContext: public IInterface {
-public:
-	virtual void evalForm(PSexpr& sexpr, CallResult& callRes) = 0;
-};
-
 class ILispFunction : public LispFunctionBase {
 
 public:
 	//virtual LispFunction(IProgram)
-	virtual void call(IRunContext& ctx, ArgsList& args, CallResult& result) = 0;
+	virtual void call(IRunContext& ctx, ArgsList& args, ICallResult& result) = 0;
 	virtual ~ILispFunction() {
 
 	}

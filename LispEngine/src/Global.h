@@ -39,6 +39,10 @@ public:
 		return this->pTopLevelRunContext;
 	}
 
+	//DIBuilder& getDIBuilder() {
+	//	return this->pTopLevelRunContext;
+	//}
+
 };
 
 Global& getGlobal() {

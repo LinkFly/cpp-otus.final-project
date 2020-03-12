@@ -14,12 +14,12 @@ set(HEADERS
 	src/share.h
 	src/interfaces/evaluator/IProgram.h
 	src/interfaces/evaluator/IEvaluator.h
-	src/interfaces/DataStructs.h
+	src/interfaces/i-data-structs.h
 	src/interfaces/IDIBuilder.h
 
 	src/BaseFunctions.h
 
-	src/implements/DataStructs.h
+	src/implements/data-structs.h
 	src/implements/evaluator/Evaluator.h
 	src/implements/DIBuilder.h
 

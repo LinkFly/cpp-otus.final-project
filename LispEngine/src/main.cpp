@@ -23,4 +23,13 @@ int main(int argc, char** argv) {
 	Number& numRes = lisp.getLastResult<Number>();
 
 	cout << numRes.getValue() << endl;
+	cout << endl << endl;
+
+	/*Repl repl;
+	DIBuilder diBuilder;
+	auto evaluator = diBuilder.createEvaluator();
+	shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*evaluator);
+	repl.run(ctx);*/
+	lisp.runRepl();
+
 }

@@ -8,8 +8,9 @@
 
 #include "../../share.h"
 #include "../../interfaces/evaluator/IProgram.h"
-#include "../../implements/DataStructs.h"
+#include "../../implements/data-structs.h"
 #include "../../interfaces/IDIBuilder.h"
+#include "../../errors.h"
 
 using std::vector;
 using std::set;
@@ -42,16 +43,6 @@ public:
 	}
 };
 
-class RunContext : public IRunContext, public CClass {
-	IEvaluator& evaluator;
-public:
-	RunContext(IEvaluator& evaluator) : evaluator{ evaluator } {}
-
-	virtual void evalForm(PSexpr& sexpr, CallResult& callRes) override {
-		evaluator.evalForm(sexpr, callRes);
-	}
-};
-
 class ArgsList : public CClass {
 	vector<PSexpr> args;
 public:
@@ -78,39 +69,15 @@ public:
 	}
 };
 
-// Warning! Maybe memory leak
-class CallResult : public CClass {
-	template< class To, class From >
-	inline std::shared_ptr< To > dynamic_pointer_cast(std::shared_ptr< From >&& ptr) {
-		To* newPtr = reinterpret_cast<To*>(ptr.release());
-		return std::shared_ptr< To >((Number*)(ptr));
-	}
-	
-	std::function<void()> deleter = nullptr;
-public:
-	PSexpr result;
-	void setResult(PSexpr sexpr, std::function<void()> deleter) {
-		result = sexpr;
-		this->deleter = deleter;
-	}
-	template<class ConcreteSexpr>
-	ConcreteSexpr& getResult() {
-		//return *reinterpret_cast<ConcreteSexpr*>(result_ptr);
-		return *reinterpret_cast<ConcreteSexpr*>(result.get());
-	}
-	~CallResult() {
-		if (deleter != nullptr) {
-			deleter();
-		}
-	}
-};
-
 class LispFunction : public ILispFunction, public CClass {
 protected:
 	PSexpr evalArg(IRunContext& ctx, PSexpr& arg) {
-		CallResult locCallRes;
-		ctx.evalForm(arg, locCallRes);
-		return locCallRes.result;
+		auto diBuilder = ctx.getDIBuilder();
+		shared_ptr<ICallResult> pLocCallRes = diBuilder->createCallResult();
+			//std::static_pointer_cast<ICallResult>(make_shared<CallResult>());
+		//CallResult locCallRes{};
+		ctx.evalForm(arg, *pLocCallRes);
+		return pLocCallRes->getResult();
 	}
 };
 
@@ -120,7 +87,7 @@ class LispSetfFunction : public LispFunction {
 
 class SetfSymbolFunction : public LispSetfFunction {
 public:
-	void call(IRunContext& ctx, ArgsList& args, CallResult& result) override {
+	void call(IRunContext& ctx, ArgsList& args, ICallResult& result) override {
 		// TODO Checking types
 		shared_ptr<Symbol> symbol = std::static_pointer_cast<Symbol>(args.get(0));
 		shared_ptr<Function> function = std::static_pointer_cast<Function>(args.get(1));
