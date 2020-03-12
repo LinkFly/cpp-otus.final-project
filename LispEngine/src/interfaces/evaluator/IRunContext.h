@@ -11,10 +11,10 @@ public:
 	virtual void evalForm(PSexpr& sexpr, ICallResult& callRes) = 0;
 	virtual uint8_t getLevel() = 0;
 	virtual void setLevel(uint8_t level) = 0;
-	virtual shared_ptr<IRunContext>& pushNewContext() = 0;
+	virtual shared_ptr<IRunContext> pushNewContext() = 0;
 	virtual shared_ptr<IRunContext> popContext() = 0;
 	virtual void setOnErrorCallback(ErrorCallback callback) = 0;
-	virtual ErrorCallback getOnErrorCallback() = 0;
+	virtual ErrorCallback& getOnErrorCallback() = 0;
 
 	virtual EResultStatus getStatus() = 0;
 	virtual void setStatus(EResultStatus status) = 0;

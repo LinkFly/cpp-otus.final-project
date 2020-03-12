@@ -263,7 +263,9 @@ public:
 				return;
 			}
 			if (result.getStatus() == EResultStatus::error) {
-				getGlobal().getRunContext()->getOnErrorCallback();
+				shared_ptr<IRunContext>& ctx = getGlobal().getRunContext();
+				ErrorCallback& callback = ctx->getOnErrorCallback();
+				callback(result.getLastError());
 			}
 			else {
 				error("Not implemented handling for this operation status");

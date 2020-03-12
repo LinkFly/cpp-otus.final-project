@@ -20,6 +20,9 @@ public:
 		auto res = lispEngine.evalSexprStr(expr);
 		cout << res << endl;
 	}
+	void printError(shared_ptr<Error>& err) {
+		cerr << "\n[ERROR]: " << err->message << endl;
+	}
 	void run(shared_ptr<IRunContext> & ctx) {
 		outCommandPrompt(*ctx);
 		while (true) {

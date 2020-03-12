@@ -8,13 +8,13 @@
 
 class RunContext : public IRunContext, public CClass {
 	IEvaluator& evaluator;
-	shared_ptr<IRunContext>& createRunContext() {
+	shared_ptr<IRunContext> createRunContext() {
 		shared_ptr<IRunContext> ctx = 
 			std::static_pointer_cast<IRunContext>(make_shared<RunContext>(evaluator));
 		ctx->getParentContext().reset(this);
 		// TODO setLevel/getLevel rename to setDebugLevel/getDebugLevel
 		ctx->setLevel(getLevel() + 1);
-		return std::static_pointer_cast<IRunContext>(ctx);
+		return ctx;
 	}
 	uint8_t level;
 	shared_ptr<Error> error = Error::getNoError();
@@ -37,11 +37,11 @@ public:
 	}
 
 	virtual void setLevel(uint8_t level) override {
-		level = level;
+		this->level = level;
 	}
 
-	virtual shared_ptr<IRunContext>& pushNewContext() override {
-		return std::static_pointer_cast<IRunContext>(createRunContext());
+	virtual shared_ptr<IRunContext> pushNewContext() override {
+		return createRunContext();
 	}
 
 	virtual shared_ptr<IRunContext> popContext() override {
@@ -53,7 +53,7 @@ public:
 		onErrorCallback = callback;
 	}
 
-	virtual ErrorCallback getOnErrorCallback() override {
+	virtual ErrorCallback& getOnErrorCallback() override {
 		return onErrorCallback;
 	}
 	/////////////////////////////////////

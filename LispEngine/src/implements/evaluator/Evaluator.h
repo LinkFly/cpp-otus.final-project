@@ -20,6 +20,11 @@ public:
 					callRes.setResult(sym, nullptr);
 				}
 				else {
+					auto boundedValue = sym->getValue();
+					if (boundedValue.get() == nullptr) {
+						callRes.setErrorResult(make_shared<ErrorSymbolUnbound>());
+						return;
+					}
 					callRes.setResult(sym->getValue(), nullptr);
 				}
 				
@@ -66,6 +71,11 @@ public:
 			//shared_ptr<ICallResult> pCallRes;
 			pLastResult.swap(pCallRes);
 			evalForm(form, *pLastResult.get());
+			if (pLastResult->getStatus() == EResultStatus::error) {
+				auto& global = getGlobal();
+				ErrorCallback& errCallback = global.getRunContext()->getOnErrorCallback();
+				errCallback(pLastResult->getLastError());
+			}
 		}
 	}
 

@@ -107,8 +107,8 @@ public:
 		registerSymbolSelfEvaluated("t");
 		registerSymbolValue("nil", std::static_pointer_cast<Sexpr>(nil));
 
-		errCallback = [](Error& err) {
-			cerr << err.message << endl;
+		errCallback = [](shared_ptr<Error>& err) {
+			cerr << err->message << endl;
 		};
 
 		initTopLevelRunContext();
@@ -124,8 +124,14 @@ public:
 	}
 
 	void evalProgram() {
-		evaluator->eval(*program.get(), [](Error& err) {
-			cerr << "[ERROR]: " << err.message << endl;
+		evaluator->eval(*program.get(), [this](shared_ptr<Error>& err) {
+			auto curCtx = getGlobal().getRunContext();
+			auto& newCtx = curCtx->pushNewContext();
+			newCtx->setLastError(err);
+			getGlobal().setRunContext(newCtx);
+			repl->printError(err);
+			repl->run(newCtx);
+			/*cerr << "[ERROR]: " << err.message << endl;*/
 			});
 	}
 

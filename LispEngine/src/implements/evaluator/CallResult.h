@@ -25,6 +25,13 @@ public:
 		result = sexpr;
 	}
 
+	virtual shared_ptr<Error> getLastError() override {
+		return lastError;
+	}
+	virtual void setLastError(shared_ptr<Error> err) override {
+		lastError = err;
+	}
+
 	void setResult(PSexpr sexpr, std::function<void()> deleter = nullptr) override {
 		status = EResultStatus::success;
 		result = sexpr;
@@ -33,7 +40,7 @@ public:
 
 	void setErrorResult(shared_ptr<Error> error, std::function<void()> deleter = nullptr) override {
 		status = EResultStatus::error;
-		lastError = error;
+		setLastError(error);
 		this->deleter = deleter;
 	}
 

@@ -17,19 +17,21 @@ int main(int argc, char** argv) {
 	//test->doIt();
 
 	LispEngine lisp;
-	//lisp.readProgram(gstring{ "(plus 32 6)" });
-	lisp.readProgram(gstring{ "(plus (plus 30 2) 6)" });
-	lisp.evalProgram();
-	Number& numRes = lisp.getLastResult<Number>();
 
-	cout << numRes.getValue() << endl;
-	cout << endl << endl;
+	////lisp.readProgram(gstring{ "(plus 32 6)" });
+	//lisp.readProgram(gstring{ "(plus (plus 30 2) 6)" });
+	//lisp.evalProgram();
+	//Number& numRes = lisp.getLastResult<Number>();
+
+	//cout << numRes.getValue() << endl;
+	//cout << endl << endl;
 
 	/*Repl repl;
 	DIBuilder diBuilder;
 	auto evaluator = diBuilder.createEvaluator();
 	shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*evaluator);
 	repl.run(ctx);*/
+
 	lisp.runRepl();
 
 }

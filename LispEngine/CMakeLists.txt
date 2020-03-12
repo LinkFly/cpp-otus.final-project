@@ -25,6 +25,7 @@ set(HEADERS
 
 	src/LispEngine.h
 	)
+aux_source_directory(src/implements/evaluator, EVALUATOR)
 set(TEST_SOURCES
 	src/tests.cpp
 	)

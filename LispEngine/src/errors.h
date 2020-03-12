@@ -5,7 +5,7 @@
 #include <functional>
 
 enum class EErrorCode {
-	noError, badArg, symbolNotExists
+	noError, badArg, symbolNotExists, symbolUnbound
 };
 
 class Error : public CClass {
@@ -27,9 +27,14 @@ class ErrorHandling : public CClass {
 	}
 };
 
+using ErrorCallback = std::function<void(shared_ptr<Error>& error)>;
+
 class ErrorBadArg : public Error {
 public:
 	ErrorBadArg() : Error(gstring{ "Bad arg" }, EErrorCode::badArg) {}
 };
 
-using ErrorCallback = std::function<void(Error & error)>;
+class ErrorSymbolUnbound : public Error {
+public:
+	ErrorSymbolUnbound() : Error(gstring{ "Symbol is unbound" }, EErrorCode::symbolUnbound) {}
+};

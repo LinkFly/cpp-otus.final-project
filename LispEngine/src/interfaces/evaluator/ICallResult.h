@@ -18,6 +18,7 @@ public:
 	///*EResultStatus status = EResultStatus::unknown;
 	//PSexpr result;*/
 	//virtual PSexpr getResult() = 0;
+	virtual PSexpr& getResult() = 0;
 	virtual void setResult(PSexpr result) = 0;
 	virtual void setResult(PSexpr sexpr, std::function<void()> deleter = nullptr) = 0;
 	//	status = EResultStatus::success;
@@ -25,7 +26,8 @@ public:
 	//	this->deleter = deleter;
 	//}
 
-	virtual PSexpr& getResult() = 0;
+	virtual shared_ptr<Error> getLastError() = 0;
+	virtual void setLastError(shared_ptr<Error> err) = 0;
 
 	virtual void setErrorResult(shared_ptr<Error> error, std::function<void()> deleter = nullptr) = 0;/*{
 		status = EResultStatus::error;
