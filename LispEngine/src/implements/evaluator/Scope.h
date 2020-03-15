@@ -23,9 +23,9 @@ public:
 	virtual PSexpr& get(const gstring& name) override {
 		return (*nsTable)[name];
 	}
-	virtual shared_ptr<IScope> pushNewScope() override {
+	virtual shared_ptr<IScope> pushNewScope(shared_ptr<IScope>& parentScope) override {
 		shared_ptr<Scope> newScope = make_shared<Scope>();
-		newScope->parentScope = shared_ptr<IScope>(dynamic_cast<IScope*>(this));
+		newScope->parentScope = parentScope;//shared_ptr<IScope>(dynamic_cast<IScope*>(this));
 		nextScope = std::dynamic_pointer_cast<IScope>(newScope);
 		return nextScope;
 	}

@@ -118,9 +118,48 @@ public:
 };
 
 class LetLispFunction : public LispFunction {
+	shared_ptr<IScope> getScope(IRunContext& ctx) {
+		return ctx.getProgram()->getProgramContext()->getScope();
+	}
+	void setScope(IRunContext& ctx, shared_ptr<IScope>& scope) {
+		return ctx.getProgram()->getProgramContext()->setScope(scope);
+	}
+	//void addToScope(IRunContext& ctx, gstring& symName, PSexpr& val) {
+	//	shared_ptr<IScope>& scope = getScope(ctx);
+	//	scope->add(symName, val);
+	//}
+	void extendScope(IRunContext& ctx, shared_ptr<IScope>& scope, shared_ptr<Cons>& consVarVal) {
+		//auto curVarVal = std::static_pointer_cast<Cons>(consVarVal->car());
+		auto var = std::static_pointer_cast<Symbol>(consVarVal->car());
+		auto tmp = std::static_pointer_cast<Cons>(consVarVal->cdr());
+		auto val = tmp->car();
+		val = evalArg(ctx, val);
+		scope->add(var->getName(), val);
+	}
 public:
 	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto oneArg = args.get(0); // not evaluted
+		shared_ptr<IScope> scope = getScope(ctx);
+		if (oneArg->isCons()) {
+			// Create and set new scope
+			scope = scope->pushNewScope(scope);
+			setScope(ctx, scope);
+
+			auto& cons = std::static_pointer_cast<Cons>(oneArg);
+			//PSexpr curVarVal;
+			do {
+				auto& curVarVal = std::static_pointer_cast<Cons>(cons->car());
+				//shared_ptr<Cons> curVarVal;
+				extendScope(ctx, scope, curVarVal);
+				//curVarVal->
+				cons = std::static_pointer_cast<Cons>(cons->cdr());
+			} while (!cons->isNil());
+		}
+		else {
+			if (!oneArg->isNil()) {
+				error("ERROR: Bad LET arg");
+			}
+		}
 		// push new scope
 		// ...
 		// working with scope
@@ -137,6 +176,7 @@ public:
 		// TODO use diBuilder
 		res.setResult(make_shared<Nil>(), nullptr);
 		// restore scope
-		// ...
+		scope =  scope->popScope();
+		setScope(ctx, scope);
 	}
 };
