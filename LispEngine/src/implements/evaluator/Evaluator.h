@@ -27,7 +27,6 @@ public:
 					}
 					callRes.setResult(sym->getValue(), nullptr);
 				}
-				
 				return;
 			}
 			callRes.setResult(form, nullptr);
@@ -52,16 +51,34 @@ public:
 		func->call(args, callRes);
 	}
 
-	void createRunContext() {
-		shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*this);
+	virtual void createRunContext(shared_ptr<IScope>& scope, bool isNewDebugLevel) override {
+		//shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*this);
+		//shared_ptr<IRunContext> actualCtx;
+		auto& actualCtx = getGlobal().getRunContext();
+		bool bCurCtxIsTopLevel = actualCtx->isTopLevel();
+		/*if (curCtx.get() != nullptr) {
+			actualCtx = curCtx;
+			bCurCtxIsTopLevel = false;
+		}
+		else {
+			actualCtx = getGlobal().getTopLevelRunContext();
+			bCurCtxIsTopLevel = true;
+		}*/
+		shared_ptr<IRunContext> ctx;
+		if (!(isNewDebugLevel || bCurCtxIsTopLevel)) {
+			actualCtx = actualCtx->popContext();
+		}
+		ctx = actualCtx->pushNewContext(actualCtx);
+		ctx->getProgram()->getProgramContext()->setScope(scope);
 		getGlobal().setRunContext(ctx);
 	}
-	shared_ptr<IRunContext>& getRunContext() {
+
+	shared_ptr<IRunContext> getRunContext() {
 		return getGlobal().getRunContext();
 	}
 
 	virtual void eval(IProgram& program, ErrorCallback onErrorCallback = nullptr) override {
-		createRunContext();
+		/*createRunContext();*/
 		getRunContext()->setOnErrorCallback(onErrorCallback);
 		getRunContext()->setDIBuilder(&diBuilder);
 		for (PSexpr& form : program.getProgramForms()) {

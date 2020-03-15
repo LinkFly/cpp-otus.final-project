@@ -10,4 +10,5 @@ public:
 	virtual ICallResult& getLastResult() = 0;
 	/*virtual void setRepl(Repl& repl) = 0;
 	virtual Repl& getRepl() = 0;*/
+	virtual void createRunContext(shared_ptr<IScope>& scope, bool isNewDebugLevel) = 0;
 };

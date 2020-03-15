@@ -167,16 +167,32 @@ class Reader : public IReader, public CClass {
 		int32_t num = std::stoi(token);
 		return diBuilder.createNumber(num);
 	}
+
+	PSexpr getSymInParent(const gstring& token, IProgram& program) {
+		auto& parentProgram = program.getParentProgram();
+		PSexpr res;
+		if (parentProgram.get() != nullptr) {
+			res = parentProgram->getSymByName(token);
+		}
+		return res;
+	}
 public:
 	Reader(IDIBuilder& diBuilder) : diBuilder{ diBuilder } {
 
 	}
 
 	virtual PSexpr& parseSymbol(gstring token, IProgram& program) override {
-		PSexpr& res = program.getProgramContext()->getScope()->get(token);
+		//PSexpr& res = program.getProgramContext()->getScope()->get(token);
+		PSexpr& res = program.getSymByName(token);
 		if (res.get() != nullptr) {
 			return res;
 		}
+
+		PSexpr& resInParent = getSymInParent(token, program);
+		if (resInParent.get() != nullptr) {
+			return res;
+		}
+
 		program.createSymbol(token);
 		res = program.getProgramContext()->getScope()->get(token);
 		return res;

@@ -123,8 +123,8 @@ public:
 		return std::dynamic_pointer_cast<IReader>(make_shared<Reader>(idiBuilder));
 	}
 
-	shared_ptr<IProgram> createProgram(IDIBuilder& idiBuilder) {
-		return std::dynamic_pointer_cast<IProgram>(make_shared<Program>(idiBuilder));
+	virtual shared_ptr<IProgram> createProgram(IRunContext& ctx/*IDIBuilder& idiBuilder*/) override {
+		return std::dynamic_pointer_cast<IProgram>(make_shared<Program>(*this, ctx));
 	}
 
 	shared_ptr<IEvaluator> createEvaluator() {
@@ -132,7 +132,7 @@ public:
 	}
 
 	virtual shared_ptr<IRunContext> createRunContext(IEvaluator& evaluator) override {
-		auto res = std::dynamic_pointer_cast<IRunContext>(make_shared<RunContext>(evaluator));
+		auto res = std::dynamic_pointer_cast<IRunContext>(make_shared<RunContext>(evaluator, this));
 		res->setDIBuilder(this);
 		return res;
 	}

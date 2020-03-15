@@ -32,6 +32,7 @@ public:
 	}
 
 	virtual shared_ptr<IProgramContext> createProgramContext() = 0;
+	virtual shared_ptr<IProgram> createProgram(IRunContext& ctx/*IDIBuilder& idiBuilder*/) = 0;
 	virtual shared_ptr<IMemoryManager> createMemoryManager() = 0;
 	virtual shared_ptr<IRunContext> createRunContext(IEvaluator& evaluator) = 0;
 	virtual shared_ptr<ICallResult> createCallResult() = 0;

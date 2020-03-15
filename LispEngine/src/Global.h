@@ -2,6 +2,8 @@
 
 #include "share-base.h"
 
+#include <functional>
+
 enum class ETypeId { nil, pointerToAtom, pointerToCons, number, symbol, function, cons, custom };
 
 class Global {
@@ -17,6 +19,12 @@ public:
 		memoryManager = std::dynamic_pointer_cast<IMemoryManager>(make_shared<MemoryManager>());
 
 	}
+
+	~Global() {
+		if (memoryManager.get() != nullptr) {
+
+		}
+	}
 	/*shared_ptr<DIBuilder> getDiBuilder() {
 		return make_shared<DIBuilder>();
 	}*/
@@ -28,8 +36,13 @@ public:
 	void setRunContext(shared_ptr<IRunContext>& ctx) {
 		pRunContext = ctx;
 	}
-	shared_ptr<IRunContext>& getRunContext() {
-		return this->pRunContext;
+	shared_ptr<IRunContext> getRunContext() {
+		if (this->pRunContext.get() != nullptr) {
+			return this->pRunContext;
+		}
+		else {
+			return this->pTopLevelRunContext;
+		}
 	}
 
 	void setTopLevelRunContext(shared_ptr<IRunContext>& ctx) {
@@ -43,9 +56,90 @@ public:
 	//	return this->pTopLevelRunContext;
 	//}
 
+public:
+
 };
 
-Global& getGlobal() {
-	static Global global = Global{};
-	return global;
+struct GlobalController {
+	unique_ptr<Global> pGlobal;
+
+	/*GlobalController() {
+		pGlobal.swap(make_unique<Global>());
+	}*/
+
+	void setGlobal(unique_ptr<Global>& global) {
+		pGlobal.swap(global);
+	}
+	unique_ptr<Global>& getGlobal() {
+		return pGlobal;
+	}
+
+	void resetGlobal() {
+		pGlobal.reset();
+	}
+};
+
+GlobalController& getGlobalController() {
+	static GlobalController globalController;
+	return globalController;
 }
+//Global& getGlobal() {
+//	return *getGlobalController().getGlobal();
+//}
+
+Global* global;
+
+std::function<Global&()> fnGetGlobal;
+
+
+
+void setFnGlobal(std::function<Global & ()>* func) {
+	fnGetGlobal = *func;
+}
+
+void createGlobal() {
+	global = new Global();
+}
+
+//Global& getGlobal() {
+//	return *global;
+//	//return fnGetGlobal();
+//}
+
+void setGlobal(Global* global_ptr) {
+	global = global_ptr;
+}
+
+void freeGlobal() {
+	delete global;
+}
+
+
+
+
+class LispEngineBase {
+private:
+	Global global;
+public:
+	Global& getGlobal() {
+		return global;
+	}
+};
+
+LispEngineBase* lispEngine;
+
+void setLispEngine(LispEngineBase* engine) {
+	lispEngine = engine;
+}
+
+LispEngineBase* getLispEngine() {
+	return lispEngine;
+}
+
+Global& getGlobal() {
+	return lispEngine->getGlobal();
+}
+
+//struct GlobalGetter {
+//	GlobalGetter(Global)
+//};

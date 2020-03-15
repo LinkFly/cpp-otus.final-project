@@ -34,7 +34,7 @@ bool call_test(string name, std::function<bool(void)> fntest) {
 //// end Utils
 
 bool trivial_test() {
-	return call_test(__PRETTY_FUNCTION__, []() {
+	return call_test(__PRETTY_FUNCTION__, []() -> bool {
 		DIBuilder diBuilder;
 		//// Fixtures
 		int n1 = 42;
@@ -60,38 +60,47 @@ bool trivial_test() {
 }
 
 bool simple_test() {
-	return call_test(__PRETTY_FUNCTION__, []() {
+	bool res = call_test(__PRETTY_FUNCTION__, []() {
 		LispEngine lisp;
-		lisp.readProgram(gstring{ "(plus 32 6)" });
-		lisp.evalProgram();
+
+		lisp.evalSexprStr(gstring{ "(plus 32 6)" });
 		Number& numRes = lisp.getLastResult<Number>();
-		return  numRes.getValue() == 38;
+		return numRes.getValue() == 38;
 	});
+	/*LispEngine::clean();*/
+	return res;
 }
 
 bool nested_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		LispEngine lisp;
-		lisp.readProgram(gstring{ "(plus (plus 30 2) 6)" });
-		lisp.evalProgram();
+		/*lisp.readProgram(gstring{ "(plus (plus 30 2) 6)" });
+		lisp.evalProgram();*/
+		lisp.evalSexprStr(gstring{ "(plus (plus 30 2) 6)" });
 		Number& numRes = lisp.getLastResult<Number>();
-		return  numRes.getValue() == 38;
+		bool res = numRes.getValue() == 38;
+		/*lisp.clean();*/
+		return res;
 		});
 }
 
 bool cons_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		LispEngine lisp;
+
 		int64_t waitFirst = 42;
 		int64_t waitSecond = 3;
-		lisp.readProgram(gstring{ "(cons 42 3)" });
-		lisp.evalProgram();
+		/*lisp.readProgram(gstring{ "(cons 42 3)" });
+		lisp.evalProgram();*/
+		lisp.evalSexprStr(gstring{ "(cons 42 3)" });
 		Cons& consRes = lisp.getLastResult<Cons>();
 		shared_ptr<Number> firstElt = std::static_pointer_cast<Number>(consRes.car());
 		bool isFirst = firstElt->getValue() == waitFirst;
 		shared_ptr<Number> secondElt = std::static_pointer_cast<Number>(consRes.cdr());
 		bool isSecond = secondElt->getValue() == waitSecond;
-		return isFirst && isSecond;
+		bool res = isFirst && isSecond;
+		/*lisp.clean();*/
+		return res;
 		});
 }
 
@@ -99,10 +108,13 @@ bool car_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		LispEngine lisp;
 		int64_t waitRes = 42;
-		lisp.readProgram(gstring{ "(car (cons 42 3))" });
-		lisp.evalProgram();
+		/*lisp.readProgram(gstring{ "(car (cons 42 3))" });
+		lisp.evalProgram();*/
+		lisp.evalSexprStr(gstring{ "(car (cons 42 3))" });
 		Number& numRes = lisp.getLastResult<Number>();
-		return  numRes.getValue() == waitRes;
+		bool res = numRes.getValue() == waitRes;
+		/*lisp.clean();*/
+		return res;
 		});
 }
 
@@ -110,10 +122,13 @@ bool cdr_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		LispEngine lisp;
 		int64_t waitRes = 3;
-		lisp.readProgram(gstring{ "(cdr (cons 42 3))" });
-		lisp.evalProgram();
+		/*lisp.readProgram(gstring{ "(cdr (cons 42 3))" });
+		lisp.evalProgram();*/
+		lisp.evalSexprStr(gstring{ "(cdr (cons 42 3))" });
 		Number& numRes = lisp.getLastResult<Number>();
-		return  numRes.getValue() == waitRes;
+		bool res = numRes.getValue() == waitRes;
+		/*lisp.clean();*/
+		return res;
 		});
 }
 
@@ -121,24 +136,29 @@ bool self_evaluated_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		LispEngine lisp;
 		int64_t waitRes = 42;
-		lisp.readProgram(gstring{ "42" });
-		lisp.evalProgram();
+		/*lisp.readProgram(gstring{ "42" });
+		lisp.evalProgram();*/
+		lisp.evalSexprStr(gstring{ "42" });
 		Number& numRes = lisp.getLastResult<Number>();
 		bool isCheckNum = numRes.getValue() == waitRes;
 
 		PSexpr& lastRes = lisp.getLastPSexprRes();
 		lisp.registerSymbolValue("test", lastRes);
-		lisp.readProgram(gstring{ "test" });
-		lisp.evalProgram();
+		/*lisp.readProgram(gstring{ "test" });
+		lisp.evalProgram();*/
+		lisp.evalSexprStr(gstring{ "test" });
 		Number& numRes2 = lisp.getLastResult<Number>();
 		bool isCheckSymVal = numRes2.getValue() == waitRes;
 
-		lisp.readProgram(gstring{ "t" });
-		lisp.evalProgram();
+		/*lisp.readProgram(gstring{ "t" });
+		lisp.evalProgram();*/
+		lisp.evalSexprStr(gstring{ "t" });
 		Symbol& symT = lisp.getLastResult<Symbol>();
 		bool isTrue = symT.getName() == gstring{ "t" };
 		
-		return isCheckNum && isCheckSymVal && isTrue;
+		bool res = isCheckNum && isCheckSymVal && isTrue;
+		/*lisp.clean();*/
+		return res;
 	});
 }
 
@@ -146,8 +166,9 @@ bool setq_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		LispEngine lisp;
 		int64_t waitRes = 42;
-		lisp.readProgram(gstring{ "(setq test 42)" });
-		lisp.evalProgram();
+		/*lisp.readProgram(gstring{ "(setq test 42)" });
+		lisp.evalProgram();*/
+		lisp.evalSexprStr(gstring{ "(setq test 42)" });
 
 		Number& numRes = lisp.getLastResult<Number>();
 		bool isCheckReturn = numRes.getValue() == waitRes;
@@ -164,8 +185,9 @@ bool quote_test() {
 		LispEngine lisp;
 		int64_t waitNum1 = 42;
 		int64_t waitNum2 = 3;
-		lisp.readProgram(gstring{ "(quote (42 3))" });
-		lisp.evalProgram();
+		/*lisp.readProgram(gstring{ "(quote (42 3))" });
+		lisp.evalProgram();*/
+		lisp.evalSexprStr(gstring{ "(quote (42 3))" });
 
 		Cons& cons = lisp.getLastResult<Cons>();
 		//Number& sexprNum = *Number::AsNumber(cons.car());
@@ -185,13 +207,15 @@ bool if_test() {
 		{
 			int64_t waitNum1 = 1;
 			int64_t waitNum2 = 2;
-			lisp.readProgram(gstring{ "(if t 1 2)" });
-			lisp.evalProgram();
+			/*lisp.readProgram(gstring{ "(if t 1 2)" });
+			lisp.evalProgram();*/
+			lisp.evalSexprStr(gstring{ "(if t 1 2)" });
 			Number& num1 = lisp.getLastResult<Number>();
 			isSingleT = num1.getValue() == waitNum1;
 
-			lisp.readProgram(gstring{ "(if nil 1 2)" });
-			lisp.evalProgram();
+			/*lisp.readProgram(gstring{ "(if nil 1 2)" });
+			lisp.evalProgram();*/
+			lisp.evalSexprStr(gstring{ "(if nil 1 2)" });
 			Number& num2 = lisp.getLastResult<Number>();
 			isSingleNil = num2.getValue() == waitNum2;
 		}
@@ -199,13 +223,15 @@ bool if_test() {
 		{
 			int64_t waitNum1 = 5;
 			int64_t waitNum2 = 12;
-			lisp.readProgram(gstring{ "(if t (plus 2 3) (plus 7 5))" });
-			lisp.evalProgram();
+			/*lisp.readProgram(gstring{ "(if t (plus 2 3) (plus 7 5))" });
+			lisp.evalProgram();*/
+			lisp.evalSexprStr(gstring{ "(if t (plus 2 3) (plus 7 5))" });
 			Number& num1 = lisp.getLastResult<Number>();
 			isNestedT = num1.getValue() == waitNum1;
 
-			lisp.readProgram(gstring{ "(if nil (plus 2 3) (plus 7 5))" });
-			lisp.evalProgram();
+			/*lisp.readProgram(gstring{ "(if nil (plus 2 3) (plus 7 5))" });
+			lisp.evalProgram();*/
+			lisp.evalSexprStr(gstring{ "(if nil (plus 2 3) (plus 7 5))" });
 			Number& num2 = lisp.getLastResult<Number>();
 			isNestedNil = num2.getValue() == waitNum2;
 		}
@@ -219,8 +245,9 @@ bool let_trivial_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		LispEngine lisp;
 		int64_t waitNum = 42;
-		lisp.readProgram(gstring{ "(let () (plus 2 5) (plus 40 2))" });
-		lisp.evalProgram();
+		/*lisp.readProgram(gstring{ "(let () (plus 2 5) (plus 40 2))" });
+		lisp.evalProgram();*/
+		lisp.evalSexprStr(gstring{ "(let () (plus 2 5) (plus 40 2))" });
 		return waitNum == lisp.getLastResult<Number>().getValue();
 	});
 }
@@ -229,8 +256,9 @@ bool let_simple_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		LispEngine lisp;
 		int64_t waitNum = 42;
-		lisp.readProgram(gstring{ "(let ((x 2)) (plus 2 5) (plus 40 x))" });
-		lisp.evalProgram();
+		/*lisp.readProgram(gstring{ "(let ((x 2)) (plus 2 5) (plus 40 x))" });
+		lisp.evalProgram();*/
+		lisp.evalSexprStr(gstring{ "(let ((x 2)) (plus 2 5) (plus 40 x))" });
 		return waitNum == lisp.getLastResult<Number>().getValue();
 		});
 }

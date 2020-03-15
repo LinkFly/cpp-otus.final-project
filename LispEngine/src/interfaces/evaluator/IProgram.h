@@ -30,7 +30,10 @@ public:
 	virtual FormsCollection& getProgramForms() = 0;
 	virtual void addForm(PSexpr& form) = 0;
 	virtual shared_ptr<IProgramContext>& getProgramContext() = 0;
-	virtual PSexpr& createSymbol(const gstring& symName) = 0;
+	virtual PSexpr createSymbol(const gstring& symName) = 0;
+	virtual IRunContext& getRunContext() = 0;
+	virtual PSexpr& getSymByName(gstring symName) = 0;
+	virtual shared_ptr<IProgram> getParentProgram() = 0;
 };
 
 

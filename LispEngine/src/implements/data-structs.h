@@ -236,7 +236,7 @@ class Function : public Atom {
 	IMemoryManager& getMemMan() {
 		return getGlobal().getMemoryManager();
 	}
-	shared_ptr<IRunContext>& getRunContext() {
+	shared_ptr<IRunContext> getRunContext() {
 		auto global = getGlobal();
 		return global.getRunContext();
 	}

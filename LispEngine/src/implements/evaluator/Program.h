@@ -114,8 +114,9 @@ private:
 	shared_ptr<IMemoryManager> mman;
 	shared_ptr<IProgramContext> context;
 	IDIBuilder& diBuilder;
+	IRunContext& ctx;
 public:
-	Program(IDIBuilder& idiBuilder) : diBuilder{ idiBuilder } {
+	Program(IDIBuilder& idiBuilder, IRunContext& ctx) : diBuilder{ idiBuilder }, ctx { ctx } {
 		shared_ptr<IMemoryManager> mman = diBuilder.createMemoryManager();
 		shared_ptr<IProgramContext> context = diBuilder.createProgramContext();
 		constructor(mman, context);
@@ -134,10 +135,31 @@ public:
 		return context;
 	}
 
-	virtual PSexpr& createSymbol(const gstring& symName) override {
+	virtual PSexpr createSymbol(const gstring& symName) override {
 		PSexpr symSexpr = diBuilder.createSymbol(symName);
 		getProgramContext()->getScope()->add(symName, symSexpr);
 		return symSexpr;
+	}
+
+	virtual IRunContext& getRunContext() override {
+		return ctx;
+	}
+
+	//virtual void setRunContext(IRunContext& ctx) override {
+	//	this->ctx = ctx;
+	//}
+
+	virtual PSexpr& getSymByName(gstring symName) override {
+		return getProgramContext()->getScope()->get(symName);
+	}
+
+	virtual shared_ptr<IProgram> getParentProgram() override {
+		auto& parentCtx = getRunContext().getParentContext();
+		shared_ptr<IProgram> res;
+		if (parentCtx.get() != nullptr) {
+			res = parentCtx->getProgram();
+		}
+		return res;
 	}
 };
 

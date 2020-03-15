@@ -41,6 +41,8 @@ class ICallResult;
 class IRunContext;
 class Error;
 class ErrorHandling;
+//class LispEngine;
+
 using PSexpr = shared_ptr<Sexpr>;
 
 // Enums
