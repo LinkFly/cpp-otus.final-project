@@ -94,6 +94,10 @@ public:
 	//	return shared_ptr<Symbol>(new Symbol(symName));
 	//}
 
+	virtual shared_ptr<IPackage> createPackage(/*const gstring& symName*/) override {
+		return std::static_pointer_cast<IPackage>(make_shared<Package>(*this));
+	}
+
 	shared_ptr<Symbol> createSymbol(const gstring& symName) {
 		return shared_ptr<Symbol>(new Symbol(symName));
 	}

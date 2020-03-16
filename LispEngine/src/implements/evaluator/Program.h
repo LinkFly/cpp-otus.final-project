@@ -95,14 +95,44 @@ public:
 	}
 };
 
+class Package : public IPackage, public CClass {
+	map<gstring, PSexpr> nsTable;
+	IDIBuilder& diBuilder;
+public:
+	Package(IDIBuilder& diBuilder) : diBuilder{ diBuilder } {
+	
+	}
+	virtual void createSymbol(const gstring& name) override {
+		/*nsTable[name] = diBuilder.createSymbol(name);*/
+		nsTable[name] = shared_ptr<Symbol>(new Symbol(name));
+	}
+	virtual PSexpr getSymbol(const gstring& name) override {
+		PSexpr sym = nsTable[name];
+		if (sym.get() != nullptr) {
+			return sym;
+		}
+		createSymbol(name);
+		return nsTable[name];
+	}
+	/*virtual shared_ptr<IScope> pushNewScope(shared_ptr<IScope>& parentScope) = 0;
+	virtual shared_ptr<IScope>& popScope() = 0;*/
+};
+
 class ProgramContext : public IProgramContext, public CClass {
 	shared_ptr<IScope> scope;
+	shared_ptr<IScope> fnScope;
 public:
 	virtual void setScope(shared_ptr<IScope>& scope) override {
 		this->scope = scope;
 	}
 	virtual shared_ptr<IScope>& getScope() override {
 		return scope;
+	}
+	virtual void setFnScope(shared_ptr<IScope>& curFnScope) override {
+		this->fnScope = curFnScope;
+	}
+	virtual shared_ptr<IScope>& getFnScope() override {
+		return fnScope;
 	}
 };
 
@@ -149,8 +179,10 @@ public:
 	//	this->ctx = ctx;
 	//}
 
-	virtual PSexpr& getSymByName(gstring symName) override {
-		return getProgramContext()->getScope()->get(symName);
+	virtual PSexpr getSymByName(gstring symName) override {
+		shared_ptr<IPackage>& package = getPackage();
+		/*return getProgramContext()->getScope()->get(symName);*/
+		return package->getSymbol(symName);
 	}
 
 	virtual shared_ptr<IProgram> getParentProgram() override {
@@ -160,6 +192,13 @@ public:
 			res = parentCtx->getProgram();
 		}
 		return res;
+	}
+
+	virtual shared_ptr<IPackage> getPackage() override {
+		/*std::static_pointer_cast<IPackage>(*/
+		/*static shared_ptr<IPackage> package = make_shared<Package>(diBuilder);*/
+		static shared_ptr<IPackage> package = diBuilder.createPackage();
+		return package;
 	}
 };
 

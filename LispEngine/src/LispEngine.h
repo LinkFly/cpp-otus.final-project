@@ -18,6 +18,7 @@ class LispEngine : public ILispEngine, public CClass, public LispEngineBase {
 	IDIBuilder& idiBuilder = *(dynamic_cast<IDIBuilder*>(&diBuilder));
 	shared_ptr<IReader> reader = diBuilder.createReader(idiBuilder);
 	shared_ptr<IScope> scope = diBuilder.createScope();
+	shared_ptr<IScope> fnScope = diBuilder.createScope();
 	/*shared_ptr<IProgram> program = diBuilder.createProgram(idiBuilder);*/
 	shared_ptr<IEvaluator> evaluator = diBuilder.createEvaluator();
 	shared_ptr<IEvaluator> topLevelEvaluator = diBuilder.createEvaluator();
@@ -54,11 +55,11 @@ public:
 		return getProgram()->getProgramContext()->getScope()->get(symName);
 	}
 
-	PSexpr& getSymbolValue(const gstring& symName) {
+	PSexpr getSymbolValue(const gstring& symName) {
 		/*return scope->get(symName);*/
-		auto sym = std::static_pointer_cast<Symbol>(
+		PSexpr value = std::static_pointer_cast<Symbol>(
 			getProgram()->getProgramContext()->getScope()->get(symName));
-		return sym->getValue();
+		return value;
 	}
 
 	template<class TConcreteFunction>
@@ -157,6 +158,7 @@ public:
 		
 		/*repl = diBuilder.createRepl(*this);*/
 		getGlobal().getTopLevelRunContext()->getProgram()->getProgramContext()->setScope(scope);
+		getGlobal().getTopLevelRunContext()->getProgram()->getProgramContext()->setFnScope(fnScope);
 		
 		registerLispFunction<PlusLispFunction>("plus");
 		
@@ -212,7 +214,7 @@ public:
 	}
 
 	void createRunContext(bool isNewDebugLevel) {
-		evaluator->createRunContext(scope, isNewDebugLevel);
+		evaluator->createRunContext(scope, fnScope, isNewDebugLevel);
 	}
 
 	gstring evalSexprStr(gstring& sexprStr) override {

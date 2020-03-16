@@ -51,7 +51,7 @@ public:
 		func->call(args, callRes);
 	}
 
-	virtual void createRunContext(shared_ptr<IScope>& scope, bool isNewDebugLevel) override {
+	virtual void createRunContext(shared_ptr<IScope>& scope, shared_ptr<IScope>& fnScope, bool isNewDebugLevel) override {
 		//shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*this);
 		//shared_ptr<IRunContext> actualCtx;
 		auto& actualCtx = getGlobal().getRunContext();
@@ -70,6 +70,7 @@ public:
 		}
 		ctx = actualCtx->pushNewContext(actualCtx);
 		ctx->getProgram()->getProgramContext()->setScope(scope);
+		ctx->getProgram()->getProgramContext()->setFnScope(fnScope);
 		getGlobal().setRunContext(ctx);
 	}
 

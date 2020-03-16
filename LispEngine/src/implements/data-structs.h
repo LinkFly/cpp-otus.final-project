@@ -93,6 +93,17 @@ struct ConsStruct {
 	Cell* pCell;
 };
 
+//struct SymValGetter {
+//	//shared_ptr<Symbol> symbol;
+//	//SymValGetter(shared_ptr<Symbol>& sym) {
+//	//	symbol = sym;
+//	//}
+//	PSexpr get() {
+//		return getGlobal().getRunContext()->getProgram()
+//			->getProgramContext()->getScope()->get(symbol->getName());
+//	}
+//};
+
 struct SymbolDesc {
 	gstring name;
 	shared_ptr<Sexpr> bound;
@@ -290,17 +301,25 @@ public:
 		return dtype.tstruct.symbol.symDesc->name;
 	}
 	shared_ptr<Sexpr> getValue() {
-		return dtype.tstruct.symbol.symDesc->bound;
-	}
-	shared_ptr<Sexpr> getFunction() {
-		return dtype.tstruct.symbol.symDesc->fbound;
+		/*return dtype.tstruct.symbol.symDesc->bound;*/
+		return getGlobal().getRunContext()->getProgram()
+			->getProgramContext()->getScope()->get(getName());
 	}
 	void setValue(shared_ptr<Sexpr> val) {
-		dtype.tstruct.symbol.symDesc->bound = val;
+		/*dtype.tstruct.symbol.symDesc->bound = val;*/
+		getGlobal().getRunContext()->getProgram()
+			->getProgramContext()->getScope()->add(getName(), val);
+	}
+	shared_ptr<Sexpr> getFunction() {
+		/*return dtype.tstruct.symbol.symDesc->fbound;*/
+		auto fnScope = getGlobal().getRunContext()->getProgram()->getProgramContext()->getFnScope();
+		return fnScope->get(getName());
 	}
 	void setFunction(shared_ptr<Function> func) {
 		// TODO Checking function
-		dtype.tstruct.symbol.symDesc->fbound = func;
+		/*dtype.tstruct.symbol.symDesc->fbound = func;*/
+		auto fnScope = getGlobal().getRunContext()->getProgram()->getProgramContext()->getFnScope();
+		fnScope->add(getName(), std::dynamic_pointer_cast<Sexpr>(func));
 	}
 	void setSelfEval() {
 		dtype.tstruct.symbol.symDesc->bIsSelfEvaluated = true;

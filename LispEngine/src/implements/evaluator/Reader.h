@@ -181,7 +181,7 @@ public:
 
 	}
 
-	virtual PSexpr& parseSymbol(gstring token, IProgram& program) override {
+	virtual PSexpr parseSymbol(gstring token, IProgram& program) override {
 		//PSexpr& res = program.getProgramContext()->getScope()->get(token);
 		PSexpr& res = program.getSymByName(token);
 		if (res.get() != nullptr) {

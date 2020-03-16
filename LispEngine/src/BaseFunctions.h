@@ -133,7 +133,8 @@ class LetLispFunction : public LispFunction {
 		auto var = std::static_pointer_cast<Symbol>(consVarVal->car());
 		auto tmp = std::static_pointer_cast<Cons>(consVarVal->cdr());
 		auto val = tmp->car();
-		val = evalArg(ctx, val);
+		val = evalArg
+		(ctx, val);
 		scope->add(var->getName(), val);
 	}
 public:
