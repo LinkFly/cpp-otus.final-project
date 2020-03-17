@@ -221,7 +221,8 @@ public:
 		createRunContext(false);
 		readProgram(sexprStr);
 		evalProgram();
-		return (*printer)(getLastPSexprRes());
+		/*return (*printer)(getLastPSexprRes());*/
+		return "";
 	}
 
 	void runRepl() {

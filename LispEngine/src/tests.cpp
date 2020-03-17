@@ -256,9 +256,8 @@ bool let_simple_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		LispEngine lisp;
 		int64_t waitNum = 42;
-		/*lisp.readProgram(gstring{ "(let ((x 2)) (plus 2 5) (plus 40 x))" });
-		lisp.evalProgram();*/
 		lisp.evalSexprStr(gstring{ "(let ((x 2)) (plus 2 5) (plus 40 x))" });
+		/*lisp.evalSexprStr(gstring{ "(let ((x 2)) 42)" });*/
 		return waitNum == lisp.getLastResult<Number>().getValue();
 		});
 }
@@ -291,6 +290,6 @@ BOOST_AUTO_TEST_CASE(test_of_lisp_engine)
 	BOOST_CHECK(quote_test());
 	BOOST_CHECK(if_test());
 	BOOST_CHECK(let_trivial_test());
-	/*BOOST_CHECK(let_simple_test());*/
+	BOOST_CHECK(let_simple_test());
 }
 BOOST_AUTO_TEST_SUITE_END()
