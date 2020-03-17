@@ -105,6 +105,16 @@ public:
 	}
 };
 
+class EvalLispFunction : public LispFunction {
+public:
+	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
+		auto oneArg = args.get(0);
+		auto firstEvaluated = evalArg(ctx, oneArg);
+		auto secondEvaluated = evalArg(ctx, firstEvaluated);
+		res.setResult(secondEvaluated, nullptr);
+	}
+};
+
 class IfLispFunction : public LispFunction {
 public:
 	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {

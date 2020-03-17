@@ -203,4 +203,9 @@ public:
 	shared_ptr<LetLispFunction> create<LetLispFunction>() {
 		return make_shared<LetLispFunction>();
 	}
+
+	template<>
+	shared_ptr<EvalLispFunction> create<EvalLispFunction>() {
+		return make_shared<EvalLispFunction>();
+	}//
 };

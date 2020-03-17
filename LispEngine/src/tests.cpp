@@ -185,12 +185,9 @@ bool quote_test() {
 		LispEngine lisp;
 		int64_t waitNum1 = 42;
 		int64_t waitNum2 = 3;
-		/*lisp.readProgram(gstring{ "(quote (42 3))" });
-		lisp.evalProgram();*/
 		lisp.evalSexprStr(gstring{ "(quote (42 3))" });
 
 		Cons& cons = lisp.getLastResult<Cons>();
-		//Number& sexprNum = *Number::AsNumber(cons.car());
 		Number* pNum = Number::AsNumber(cons.car()).get();
 		auto num1 = pNum->getValue();
 		Cons* pNextCons = Cons::AsCons(cons.cdr()).get();
@@ -198,6 +195,17 @@ bool quote_test() {
 		auto num2 = pNum2->getValue();
 		return num1 == waitNum1 && num2 == waitNum2;
 	});
+}
+
+bool eval_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		int64_t waitNum = 45;
+		lisp.evalSexprStr(gstring{ "(eval (quote (plus 42 3)))" });
+
+		Number& numRes = lisp.getLastResult<Number>();
+		return numRes.getValue() == waitNum;
+		});
 }
 
 bool if_test() {
@@ -288,6 +296,7 @@ BOOST_AUTO_TEST_CASE(test_of_lisp_engine)
 	BOOST_CHECK(self_evaluated_test());
 	BOOST_CHECK(setq_test());
 	BOOST_CHECK(quote_test());
+	BOOST_CHECK(eval_test());
 	BOOST_CHECK(if_test());
 	BOOST_CHECK(let_trivial_test());
 	BOOST_CHECK(let_simple_test());

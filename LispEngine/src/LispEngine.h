@@ -169,6 +169,8 @@ public:
 		registerLispFunction<QuoteLispFunction>("quote");
 		registerLispFunction<IfLispFunction>("if");
 		registerLispFunction<LetLispFunction>("let");
+		registerLispFunction<EvalLispFunction>("eval");
+		
 		//////
 
 		registerSymbolSelfEvaluated("t");

@@ -184,7 +184,7 @@ class Cons : public Sexpr {
 		return global.getMemoryManager();
 	}
 public:
-	static shared_ptr<Cons>& AsCons(PSexpr& psexpr) {
+	static shared_ptr<Cons> AsCons(PSexpr& psexpr) {
 		return std::static_pointer_cast<Cons>(psexpr);
 	}
 	Cons(PSexpr& car, PSexpr& cdr) {
@@ -213,7 +213,7 @@ public:
 
 class Number : public Atom {
 public:
-	static shared_ptr<Number>& AsNumber(const PSexpr psexpr) {
+	static shared_ptr<Number> AsNumber(const PSexpr& psexpr) {
 		return std::static_pointer_cast<Number>(psexpr);
 	}
 	Number() : Number(0) {}
