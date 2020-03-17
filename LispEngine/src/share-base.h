@@ -50,5 +50,5 @@ enum class EResultStatus {
 	unknown, success, error
 };
 
-
-
+/////////////////
+class IEvaluator;

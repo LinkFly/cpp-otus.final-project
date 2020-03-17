@@ -148,12 +148,13 @@ public:
 		/*setGlobal(&global);*/
 
 		setLispEngine(dynamic_cast<LispEngineBase*>(this));
-		
+
+		getGlobal().setEvaluator(evaluator);
+
+		initTopLevelRunContext();
 		errCallback = [](shared_ptr<Error>& err) {
 			cerr << err->message << endl;
 		};
-
-		initTopLevelRunContext();
 		getGlobal().getTopLevelRunContext()->setOnErrorCallback(errCallback);
 		
 		/*repl = diBuilder.createRepl(*this);*/

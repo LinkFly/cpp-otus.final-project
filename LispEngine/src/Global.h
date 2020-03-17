@@ -7,14 +7,17 @@
 enum class ETypeId { nil, pointerToAtom, pointerToCons, number, symbol, function, cons, custom };
 
 class Global {
+	
 public:
+	using IEvaluator = typename ::IEvaluator;
 	// meta handling ETypeId
 	static const short_size typeIdBits = 4;
 	/*shared_ptr<DIBuilder> diBuilder;*/
 	shared_ptr<IMemoryManager> memoryManager;
 	shared_ptr<IRunContext> pRunContext;
 	shared_ptr<IRunContext> pTopLevelRunContext;
-	int* p;
+	shared_ptr<IEvaluator> evaluator;
+
 	Global() {
 		memoryManager = std::dynamic_pointer_cast<IMemoryManager>(make_shared<MemoryManager>());
 
@@ -52,11 +55,18 @@ public:
 		return this->pTopLevelRunContext;
 	}
 
+	void setEvaluator(shared_ptr<IEvaluator> evaluator) {
+		this->evaluator = evaluator;
+	}
+
+	shared_ptr<IEvaluator> getEvaluator() {
+		return evaluator;
+	}
+
 	//DIBuilder& getDIBuilder() {
 	//	return this->pTopLevelRunContext;
 	//}
-
-public:
+	
 
 };
 

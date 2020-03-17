@@ -191,3 +191,15 @@ public:
 		setScope(ctx, scope);
 	}
 };
+
+class LambdaLispFunction : public LispFunction {
+public:
+	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
+		auto oneArg = args.get(0);
+		oneArg = evalArg(ctx, oneArg);
+		bool bIsTrue = !oneArg->isNil();
+		auto nextArg = args.get(bIsTrue ? 1 : 2);
+		nextArg = evalArg(ctx, nextArg);
+		res.setResult(nextArg, nullptr);
+	}
+};
