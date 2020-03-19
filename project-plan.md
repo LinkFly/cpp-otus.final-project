@@ -15,12 +15,12 @@
           - управляющие вычислением: 
             - OK quote
             - OK eval
-            - apply
+            - OK apply
           - OK операции с данными: car, cdr, cons
           - предикаты: symbolp, atomp, consp, numberp, functionp
           - работающие с контекстом вычисления:
             - OK let
-            - (in-progress) lambda
+            - OK lambda
           - управляющие:
             - OK if
             - tagbody

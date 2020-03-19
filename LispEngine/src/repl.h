@@ -17,11 +17,12 @@ class Repl : public CClass {
 public:
 	Repl(ILispEngine& lispEngine) : lispEngine{ lispEngine } {}
 	void handler(gstring& expr) {
-		auto res = lispEngine.evalSexprStr(expr);
+		lispEngine.evalSexprStr(expr);
+		auto res = lispEngine.getPrinter()(lispEngine.getLastPSexprRes());
 		cout << res << endl;
 	}
 	void printError(shared_ptr<Error>& err) {
-		cerr << "\n[ERROR]: " << err->message << endl;
+		cerr << "\n[ERROR]: " << err->getMessage() << endl;
 	}
 	void run(shared_ptr<IRunContext> & ctx) {
 		outCommandPrompt(*ctx);

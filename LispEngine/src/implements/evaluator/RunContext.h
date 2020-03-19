@@ -125,4 +125,90 @@ public:
 	virtual bool isTopLevel() {
 		return getParentContext().get() == nullptr;
 	}
+
+	void debugPrintAtom(PSexpr elt) {
+		if (elt->isSymbol()) {
+			auto sym = std::static_pointer_cast<Symbol>(elt);
+			cout << " " << sym->getName();
+		}
+		else if (elt->isNil()) {
+			cout << " nil";
+		}
+		else if (elt->isNumber()) {
+			auto num = std::static_pointer_cast<Number>(elt);
+			cout << " " << num->getValue();
+		}
+		else if (elt->isFunction()) {
+		cout << " <function>";
+		}
+		else {
+			cout << " <unknown>";
+		}
+	}
+
+	void debugPrintNext(PSexpr head, PSexpr rest) {
+		debugPrint(head);
+		/*shared_ptr<Cons> cons = std::static_pointer_cast<Cons>(consSexpr);
+		auto car = cons->car();
+		auto cdr = cons->cdr();*/
+		if (rest->isNil()) {
+			cout << " )" << endl;
+		}
+		else if (rest->isAtom()) {
+			cout << " .";
+			debugPrintAtom(rest);
+		}
+		else if (rest->isCons()) {
+			shared_ptr<Cons> cons = std::static_pointer_cast<Cons>(rest);
+			auto car = cons->car();
+			auto cdr = cons->cdr();
+			debugPrintNext(car, cdr);
+		}
+	}
+	virtual void debugPrint(PSexpr consSexpr) override {
+		if (!consSexpr->isCons()) {
+			debugPrintAtom(consSexpr);
+		}
+		else {
+			cout << " ("; //<< endl << "\t";
+			shared_ptr<Cons> cons = std::static_pointer_cast<Cons>(consSexpr);
+			auto car = cons->car();
+			auto cdr = cons->cdr();
+			debugPrintNext(car, cdr);
+		}
+		//if (consSexpr->isCons()) {
+		//	shared_ptr<Cons> cons = std::static_pointer_cast<Cons>(consSexpr);
+		//	auto car = cons->car();
+		//	auto cdr = cons->cdr();
+		//	cout << "("; //<< endl << "\t";
+		//	//auto curCons = std::static_pointer_cast<Cons>(car);
+		//	debugPrint(car);
+		//	if (cdr->isNil()) {
+		//		cout << ")" << endl;
+		//	}
+		//	else {
+		//		if (!cdr->isCons()) {
+		//			cout << " . ";
+		//			debugPrintAtom(cdr);
+		//		}
+		//		else if (cdr->isCons()) {
+		//			shared_ptr<Cons> cons = std::static_pointer_cast<Cons>(cdr);
+		//			auto curCar = cons->car();
+		//			auto curCdr = cons->cdr();
+		//			debugPrint(curCar);
+		//			if (curCdr->isNil()) {
+		//				cout << ")" << endl;
+		//			}
+		//			else {
+		//				debugPrint(curCdr);
+		//			}
+		//		}
+		//	}
+		//}
+		
+		
+		
+		/*Printer printer;
+		printer(cons);*/
+	}
 };

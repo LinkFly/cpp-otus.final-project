@@ -4,7 +4,7 @@
 
 #include <functional>
 
-enum class ETypeId { nil, pointerToAtom, pointerToCons, number, symbol, function, cons, custom };
+enum class ETypeId { nil, pointerToAtom, pointerToCons, number, symbol, function, lambda, cons, custom };
 
 class Global {
 	

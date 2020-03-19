@@ -43,41 +43,21 @@ public:
 	}
 };
 
-class ArgsList : public CClass {
-	vector<PSexpr> args;
-public:
-	ArgsList() {
-		args.resize(0);
-	}
-	ArgsList(shared_ptr<Sexpr> one) {
-		args.resize(1);
-		args[0] = one;
-	}
-	ArgsList(shared_ptr<Sexpr> one, shared_ptr<Sexpr> two) {
-		args.resize(2);
-		args[0] = one;
-		args[1] = two;
-	}
-	void addArg(PSexpr& sexpr) {
-		args.push_back(sexpr);
-	}
-	shared_ptr<Sexpr> get(short_size argPos) {
-		return args[argPos];
-	}
-	size_t size() {
-		return args.size();
-	}
-};
-
 class LispFunction : public ILispFunction, public CClass {
 protected:
-	PSexpr evalArg(IRunContext& ctx, PSexpr& arg) {
-		auto diBuilder = ctx.getDIBuilder();
-		shared_ptr<ICallResult> pLocCallRes = diBuilder->createCallResult();
+	// TODO!!! Use ICallRes!!! (for error reaction)
+	/*static */PSexpr evalArg(IRunContext& ctx, PSexpr& arg, ICallResult& res) {
+		
+		/*auto diBuilder = ctx.getDIBuilder();
+		shared_ptr<ICallResult> pLocCallRes = diBuilder->createCallResult();*/
+
 			//std::static_pointer_cast<ICallResult>(make_shared<CallResult>());
 		//CallResult locCallRes{};
-		ctx.evalForm(arg, *pLocCallRes);
-		return pLocCallRes->getResult();
+
+		//ctx.evalForm(arg, *pLocCallRes);
+
+		ctx.evalForm(arg, res);
+		return res.getResult();
 	}
 };
 

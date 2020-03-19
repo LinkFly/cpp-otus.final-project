@@ -14,20 +14,26 @@ class PlusLispFunction : public LispFunction {
 public:
 	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		PSexpr arg1 = args.get(0);
-		arg1 = evalArg(ctx, arg1);
+		arg1 = evalArg(ctx, arg1, res);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
 		auto oneArg = reinterpret_cast<Number*>(arg1.get());
-		if (oneArg == nullptr) {
+		/*if (oneArg == nullptr) {
 			auto error = make_shared<ErrorBadArg>();
 			res.setErrorResult(error);
 			return;
-		}
+		}*/
 		PSexpr arg2 = args.get(1);
-		arg2 = evalArg(ctx, arg2);
+		arg2 = evalArg(ctx, arg2, res);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
 		auto twoArg = reinterpret_cast<Number*>(arg2.get());
-		if (oneArg == nullptr || twoArg == nullptr) {
+		/*if (oneArg == nullptr || twoArg == nullptr) {
 			cerr << "Bad args\n";
 			exit(-1);
-		}
+		}*/
 		//Sexpr* resNumber = new Number(oneArg->getValue() + twoArg->getValue());
 		shared_ptr<Sexpr> resNumber = std::static_pointer_cast<Sexpr>(
 			make_shared<Number>(oneArg->getValue() + twoArg->getValue()));
@@ -42,7 +48,10 @@ class CarLispFunction : public LispFunction {
 public:
 	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto arg1 = args.get(0);
-		arg1 = evalArg(ctx, arg1);
+		arg1 = evalArg(ctx, arg1, res);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
 		auto oneArg = arg1.get();
 		if (oneArg == nullptr || !oneArg->isCons()) {
 			cerr << "Bad argument\n";
@@ -56,7 +65,10 @@ class CdrLispFunction : public LispFunction {
 public:
 	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto arg1 = args.get(0);
-		arg1 = evalArg(ctx, arg1);
+		arg1 = evalArg(ctx, arg1, res);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
 		auto oneArg = arg1.get();
 		if (oneArg == nullptr || !oneArg->isCons()) {
 			cerr << "Bad argument\n";
@@ -70,9 +82,15 @@ class ConsLispFunction : public LispFunction {
 public:
 	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto oneArg = args.get(0);
-		oneArg = evalArg(ctx, oneArg);
+		oneArg = evalArg(ctx, oneArg, res);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
 		auto twoArg = args.get(1);
-		twoArg = evalArg(ctx, twoArg);
+		twoArg = evalArg(ctx, twoArg, res);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
 		if (oneArg.get() == nullptr || twoArg.get() == nullptr) {
 			cerr << "Bad args\n";
 			exit(-1);
@@ -86,7 +104,10 @@ public:
 	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto oneArg = args.get(0); // not evaluated
 		auto twoArg = args.get(1);
-		twoArg = evalArg(ctx, twoArg);
+		twoArg = evalArg(ctx, twoArg, res);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
 		if (!oneArg->isSymbol()) {
 			cerr << "ERROR: first arg is not Symbol\n";
 			exit(-1);
@@ -109,8 +130,14 @@ class EvalLispFunction : public LispFunction {
 public:
 	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto oneArg = args.get(0);
-		auto firstEvaluated = evalArg(ctx, oneArg);
-		auto secondEvaluated = evalArg(ctx, firstEvaluated);
+		auto firstEvaluated = evalArg(ctx, oneArg, res);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
+		auto secondEvaluated = evalArg(ctx, firstEvaluated, res);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
 		res.setResult(secondEvaluated, nullptr);
 	}
 };
@@ -119,10 +146,16 @@ class IfLispFunction : public LispFunction {
 public:
 	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
 		auto oneArg = args.get(0);
-		oneArg = evalArg(ctx, oneArg);
+		oneArg = evalArg(ctx, oneArg, res);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
 		bool bIsTrue = !oneArg->isNil();
 		auto nextArg = args.get(bIsTrue ? 1 : 2);
-		nextArg = evalArg(ctx, nextArg);
+		nextArg = evalArg(ctx, nextArg, res);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
 		res.setResult(nextArg, nullptr);
 	}
 };
@@ -138,13 +171,16 @@ class LetLispFunction : public LispFunction {
 	//	shared_ptr<IScope>& scope = getScope(ctx);
 	//	scope->add(symName, val);
 	//}
-	void extendScope(IRunContext& ctx, shared_ptr<IScope>& scope, shared_ptr<Cons>& consVarVal) {
+	void extendScope(IRunContext& ctx, shared_ptr<IScope>& scope, shared_ptr<Cons>& consVarVal,
+		ICallResult& res) {
 		//auto curVarVal = std::static_pointer_cast<Cons>(consVarVal->car());
 		auto var = std::static_pointer_cast<Symbol>(consVarVal->car());
 		auto tmp = std::static_pointer_cast<Cons>(consVarVal->cdr());
 		auto val = tmp->car();
-		val = evalArg
-		(ctx, val);
+		val = evalArg(ctx, val, res);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
 		scope->add(var->getName(), val);
 	}
 public:
@@ -161,7 +197,10 @@ public:
 			do {
 				auto& curVarVal = std::static_pointer_cast<Cons>(cons->car());
 				//shared_ptr<Cons> curVarVal;
-				extendScope(ctx, scope, curVarVal);
+				extendScope(ctx, scope, curVarVal, res);
+				if (res.getStatus() != EResultStatus::success) {
+					return;
+				}
 				//curVarVal->
 				cons = std::static_pointer_cast<Cons>(cons->cdr());
 			} while (!cons->isNil());
@@ -179,7 +218,10 @@ public:
 			PSexpr nextArg;
 			for (short_size i = 1; i < args.size(); ++i) {
 				nextArg = args.get(i);
-				nextArg = evalArg(ctx, nextArg);
+				nextArg = evalArg(ctx, nextArg, res);
+				if (res.getStatus() != EResultStatus::success) {
+					return;
+				}
 			}
 			res.setResult(nextArg, nullptr);
 			return;
@@ -195,11 +237,60 @@ public:
 class LambdaLispFunction : public LispFunction {
 public:
 	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
-		auto oneArg = args.get(0);
-		oneArg = evalArg(ctx, oneArg);
-		bool bIsTrue = !oneArg->isNil();
-		auto nextArg = args.get(bIsTrue ? 1 : 2);
-		nextArg = evalArg(ctx, nextArg);
-		res.setResult(nextArg, nullptr);
+		auto params = args.get(0);
+		auto diBuilder = ctx.getDIBuilder();
+		PSexpr forms = std::static_pointer_cast<Sexpr>(diBuilder->createNil());
+		if (args.size() > 1) {
+			for (int i = 1; i < args.size(); ++i) {
+				auto curForm = args.get(i);
+				forms = diBuilder->createCons(curForm, forms);
+			}
+		}
+		PSexpr lambdaFunction = diBuilder->createLambda(params, forms);
+		res.setResult(lambdaFunction, nullptr);
+	}
+};
+
+class ApplyLispFunction: public LispFunction{
+	shared_ptr<ArgsList> getArgsList(PSexpr args) {
+		shared_ptr<ArgsList> argsList = make_shared<ArgsList>();
+		PSexpr curArgs = args;
+		while (!curArgs->isNil() && curArgs->isCons()) {
+			auto cons = std::static_pointer_cast<Cons>(curArgs);
+			auto car = cons->car();
+			curArgs = cons->cdr();
+			argsList->addArg(car);
+		}
+		return argsList;
+	}
+public:
+	void call(IRunContext& ctx, ArgsList& args, ICallResult& res) override {
+		auto symOrFunc = args.get(0);
+		ctx.debugPrint(symOrFunc);
+		symOrFunc = evalArg(ctx, symOrFunc, res);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
+		auto argsForFn = args.get(1);
+		ctx.debugPrint(argsForFn);
+		argsForFn = evalArg(ctx, argsForFn, res);
+		ctx.debugPrint(argsForFn);
+		if (res.getStatus() != EResultStatus::success) {
+			return;
+		}
+		PSexpr funcSexpr;
+		if (symOrFunc->isSymbol()) {
+			auto sym = std::static_pointer_cast<Symbol>(symOrFunc);
+			funcSexpr = sym->getFunction();
+		}
+		else {
+			funcSexpr = symOrFunc;
+		}
+		auto func = std::static_pointer_cast<Function>(funcSexpr);
+		
+		//auto diBuilder = ctx.getDIBuilder();
+		//auto callRes = diBuilder->createCallResult();
+		shared_ptr<ArgsList> argsList = getArgsList(argsForFn);
+		func->call(*argsList, res);
 	}
 };

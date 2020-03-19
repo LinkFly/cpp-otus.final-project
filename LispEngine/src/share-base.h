@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <memory>
 
+#include "general-types.h"
+
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -27,8 +29,6 @@ void error(const string& errMes, int errCode = -1) {
 
 using short_size = uint8_t;
 using Cid = uint16_t;
-using gstring = std::string;
-using gchar = char;
 
 class IMemoryManager;
 class MemoryManager;
@@ -52,3 +52,11 @@ enum class EResultStatus {
 
 /////////////////
 class IEvaluator;
+
+class Number;
+class Nil;
+class Lambda;
+class Symbol;
+class Cons;
+
+class Printer;

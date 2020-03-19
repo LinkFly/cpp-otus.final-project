@@ -35,4 +35,6 @@ public:
 	virtual void setProgram(shared_ptr<IProgram>& diBuilder) = 0;
 
 	virtual bool isTopLevel() = 0;
+
+	virtual void debugPrint(PSexpr cons) = 0;
 };

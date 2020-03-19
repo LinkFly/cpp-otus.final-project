@@ -153,7 +153,7 @@ public:
 
 		initTopLevelRunContext();
 		errCallback = [](shared_ptr<Error>& err) {
-			cerr << err->message << endl;
+			cerr << err->getMessage() << endl;
 		};
 		getGlobal().getTopLevelRunContext()->setOnErrorCallback(errCallback);
 		
@@ -171,6 +171,9 @@ public:
 		registerLispFunction<IfLispFunction>("if");
 		registerLispFunction<LetLispFunction>("let");
 		registerLispFunction<EvalLispFunction>("eval");
+		registerLispFunction<LambdaLispFunction>("lambda");
+		registerLispFunction<ApplyLispFunction>("apply");
+		
 		
 		//////
 
@@ -212,8 +215,12 @@ public:
 		return *reinterpret_cast<ConcreteSexpr*>(result.get());
 	}
 
-	PSexpr& getLastPSexprRes() {
+	virtual PSexpr getLastPSexprRes() override {
 		return evaluator->getLastResult().getResult();
+	}
+
+	gstring princ(PSexpr& res) {
+		return (*printer)(res);
 	}
 
 	void createRunContext(bool isNewDebugLevel) {
@@ -226,6 +233,10 @@ public:
 		evalProgram();
 		/*return (*printer)(getLastPSexprRes());*/
 		return "";
+	}
+
+	virtual Printer getPrinter() override {
+		return *printer;
 	}
 
 	void runRepl() {

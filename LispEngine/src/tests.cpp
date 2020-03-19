@@ -270,6 +270,35 @@ bool let_simple_test() {
 		});
 }
 
+bool lambda_trivial_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		int64_t waitNum = 42;
+		lisp.evalSexprStr(gstring{ "(lambda (x y) (plus x y))" });
+		auto strRes = lisp.princ(lisp.getLastPSexprRes());
+		return strRes == "<function>";
+	});
+}
+
+bool apply_trivial_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		int64_t waitNum = 42;
+		lisp.evalSexprStr(gstring{ "(apply (quote plus) (cons 40 (cons 2 nil)))" });
+		return waitNum == lisp.getLastResult<Number>().getValue();
+		});
+}
+
+bool apply_lambda_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		int64_t waitNum = 42;
+		lisp.evalSexprStr(gstring{ "(apply (lambda (x y) (plus x y)) (cons 40 (cons 2 nil)))" });
+		auto res = lisp.getLastResult<Number>();
+		return waitNum == res.getValue();
+		});
+}
+
 void init_base_fixtures() {
 	// Init code must be here
 
@@ -300,5 +329,8 @@ BOOST_AUTO_TEST_CASE(test_of_lisp_engine)
 	BOOST_CHECK(if_test());
 	BOOST_CHECK(let_trivial_test());
 	BOOST_CHECK(let_simple_test());
+	BOOST_CHECK(lambda_trivial_test());
+	BOOST_CHECK(apply_trivial_test());
+	BOOST_CHECK(apply_lambda_test());
 }
 BOOST_AUTO_TEST_SUITE_END()

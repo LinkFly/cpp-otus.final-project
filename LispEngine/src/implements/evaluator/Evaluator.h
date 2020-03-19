@@ -22,7 +22,8 @@ public:
 				else {
 					auto boundedValue = sym->getValue();
 					if (boundedValue.get() == nullptr) {
-						callRes.setErrorResult(make_shared<ErrorSymbolUnbound>());
+						auto symName = sym->getName();
+						callRes.setErrorResult(make_shared<ErrorSymbolUnbound>(symName));
 						return;
 					}
 					callRes.setResult(sym->getValue(), nullptr);

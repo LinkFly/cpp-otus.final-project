@@ -30,6 +30,9 @@ public:
 			auto cdr = pCell->cdr;
 			return gstring{ "(" } +this->operator()(car) + " . " + this->operator()(cdr) + ")";
 		}
+		if (sexpr->isFunction()) {
+			return "<function>";
+		}
 		return "<unknown>";
 	}
 };

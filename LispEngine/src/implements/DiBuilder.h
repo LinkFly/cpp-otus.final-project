@@ -110,6 +110,10 @@ public:
 	shared_ptr<Function> createFunction(shared_ptr<ILispFunction>& lispFunc) {
 		return make_shared<Function>(lispFunc);
 	}
+
+	virtual shared_ptr<Lambda> createLambda(PSexpr params, PSexpr forms) override {
+		return make_shared<Lambda>(params, forms);
+	}
 	
 	shared_ptr<IScope> createScope() override {
 		return std::dynamic_pointer_cast<IScope>(make_shared<Scope>());
@@ -208,4 +212,15 @@ public:
 	shared_ptr<EvalLispFunction> create<EvalLispFunction>() {
 		return make_shared<EvalLispFunction>();
 	}//
+
+	template<>
+	shared_ptr<LambdaLispFunction> create<LambdaLispFunction>() {
+		return make_shared<LambdaLispFunction>();
+	}
+
+	template<>
+	shared_ptr<ApplyLispFunction> create<ApplyLispFunction>() {
+		return make_shared<ApplyLispFunction>();
+	}
+	
 };

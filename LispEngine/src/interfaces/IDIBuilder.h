@@ -5,9 +5,11 @@
 #include "../share.h"
 #include "../interfaces/evaluator/IScope.h"
 #include "../interfaces/evaluator/IEvaluator.h"
-#include "../implements/data-structs.h"
+//#include "../implements/data-structs.h"
 
 using std::shared_ptr;
+
+
 
 class IDIBuilder : public IInterface {
 public:
@@ -23,6 +25,7 @@ public:
 	virtual shared_ptr<Number> createNumber(int32_t num) = 0;
 	virtual shared_ptr<Nil> createNil() = 0;
 	virtual shared_ptr<IPackage> createPackage(/*const gstring& symName*/) = 0;
+	virtual shared_ptr<Lambda> createLambda(PSexpr params, PSexpr forms) = 0;
 	virtual shared_ptr<Symbol> createSymbol(const gstring& symName) = 0;
 
 	template<class SexprChild1, class SexprChild2>
