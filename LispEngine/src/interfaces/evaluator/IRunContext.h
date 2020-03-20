@@ -5,10 +5,15 @@
 #include <functional>
 
 #include "../IDIBuilder.h"
+#include "../ILispEngine.h"
 
 class IRunContext : public IInterface {
 public:
-	virtual void evalForm(PSexpr& sexpr, ICallResult& callRes) = 0;
+	virtual void setQuit() = 0;
+	/*virtual void evalForm(PSexpr& sexpr, ICallResult& callRes) = 0;*/
+	virtual void evalForm(PSexpr& sexpr, shared_ptr<ICallResult>& callRes) = 0;
+	virtual void evalSexprStr(gstring& sexprStr, ICallResult& callRes) = 0;
+	virtual void evalSexprStr(gstring& sexprStr, shared_ptr<ICallResult>& callRes) = 0;
 	virtual uint8_t getLevel() = 0;
 	virtual void setLevel(uint8_t level) = 0;
 	virtual shared_ptr<IRunContext> pushNewContext(shared_ptr<IRunContext>& parent) = 0;

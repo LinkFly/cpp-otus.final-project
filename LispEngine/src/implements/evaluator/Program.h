@@ -46,7 +46,7 @@ public:
 class LispFunction : public ILispFunction, public CClass {
 protected:
 	// TODO!!! Use ICallRes!!! (for error reaction)
-	/*static */PSexpr evalArg(IRunContext& ctx, PSexpr& arg, ICallResult& res) {
+	/*static */PSexpr evalArg(IRunContext& ctx, PSexpr& arg, shared_ptr<ICallResult>& res) {
 		
 		/*auto diBuilder = ctx.getDIBuilder();
 		shared_ptr<ICallResult> pLocCallRes = diBuilder->createCallResult();*/
@@ -57,8 +57,11 @@ protected:
 		//ctx.evalForm(arg, *pLocCallRes);
 
 		ctx.evalForm(arg, res);
-		return res.getResult();
+		return res->getResult();
 	}
+	/*virtual void call(IRunContext& ctx, ArgsList& args, shared_ptr<ICallResult>& res) override {
+		callConcrete(ctx, args, (*res));
+	}*/
 };
 
 class LispSetfFunction : public LispFunction {
@@ -67,7 +70,7 @@ class LispSetfFunction : public LispFunction {
 
 class SetfSymbolFunction : public LispSetfFunction {
 public:
-	void call(IRunContext& ctx, ArgsList& args, ICallResult& result) override {
+	void call(IRunContext& ctx, ArgsList& args, shared_ptr<ICallResult>& result) override {
 		// TODO Checking types
 		shared_ptr<Symbol> symbol = std::static_pointer_cast<Symbol>(args.get(0));
 		shared_ptr<Function> function = std::static_pointer_cast<Function>(args.get(1));

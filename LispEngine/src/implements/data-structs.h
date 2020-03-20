@@ -147,7 +147,7 @@ class Cons;
 
 class LambdaBase : public CClass {
 public:
-	virtual void call(ArgsList& args, ICallResult& callRes) = 0;
+	virtual void call(ArgsList& args, shared_ptr<ICallResult>& callRes) = 0;
 };
 
 struct LambdaDesc {
@@ -175,9 +175,17 @@ struct FunctionDesc {
 	LambdaDesc* lambdaDesc;
 };
 
+struct StringDesc {
+	gstring str;
+};
+
 struct FunctionStruct {
 	//ILispFunction* func;
 	FunctionDesc* funcDesc;
+};
+
+struct StringStruct {
+	StringDesc* strDesc;
 };
 
 //struct LambdaStruct {
@@ -187,6 +195,7 @@ struct FunctionStruct {
 union TypeStruct {
 	NilStruct nil;
 	NumberStruct number;
+	StringStruct string;
 	SymbolStruct symbol;
 	ConsStruct cons;
 	FunctionStruct function;
@@ -223,6 +232,9 @@ public:
 	}
 	bool isNumber() {
 		return dtype.typeId == ETypeId::number;
+	}
+	bool isString() {
+		return dtype.typeId == ETypeId::string;
 	}
 	bool isFunction() {
 		return dtype.typeId == ETypeId::function || dtype.typeId == ETypeId::lambda;
@@ -293,6 +305,23 @@ public:
 	}
 };
 
+class String : public Atom {
+public:
+	String() : String("") {}
+	String(const gstring& str = "") {
+		dtype.typeId = ETypeId::string;
+		auto strDesc = new StringDesc{};
+		strDesc->str = str;
+		dtype.tstruct.string.strDesc = strDesc;
+	}
+	~String() {
+		delete dtype.tstruct.string.strDesc;
+	}
+	gstring& getValue() {
+		return dtype.tstruct.string.strDesc->str;
+	}
+};
+
 class Nil : public Atom {
 public:
 	Nil() {
@@ -355,7 +384,7 @@ public:
 		return *dtype.tstruct.function.funcDesc->func;
 	}
 	using Lambda = typename ::Lambda;
-	void call(ArgsList& args, ICallResult& result) {
+	void call(ArgsList& args, shared_ptr<ICallResult> result) {
 		if (isLambda()) {
 			//reinterpret_cast<Lambda*>(this)->call(args, result);
 			dtype.tstruct.function.funcDesc->lambdaDesc->lambda->call(args, result);
@@ -363,15 +392,15 @@ public:
 		}
 		ILispFunction& fn = *(dtype.tstruct.function.funcDesc->func);
 		fn.call(*getRunContext(), args, result);
-		if (result.getStatus() != EResultStatus::success) {
-			if (result.getStatus() == EResultStatus::unknown) {
+		if (result->getStatus() != EResultStatus::success) {
+			if (result->getStatus() == EResultStatus::unknown) {
 				error("unknown operation status");
 				return;
 			}
-			if (result.getStatus() == EResultStatus::error) {
+			if (result->getStatus() == EResultStatus::error) {
 				shared_ptr<IRunContext>& ctx = getGlobal().getRunContext();
 				ErrorCallback& callback = ctx->getOnErrorCallback();
-				callback(result.getLastError());
+				callback(result->getLastError());
 			}
 			else {
 				error("Not implemented handling for this operation status");
@@ -464,7 +493,7 @@ public:
 		return res;
 	}
 
-	virtual void call(ArgsList& args, ICallResult& result) override {
+	virtual void call(ArgsList& args, shared_ptr<ICallResult>& result) override {
 		shared_ptr<IRunContext>& ctx = getRunContext();
 		auto params = getParams();
 		cout << endl;

@@ -27,6 +27,7 @@ public:
 	virtual shared_ptr<IPackage> createPackage(/*const gstring& symName*/) = 0;
 	virtual shared_ptr<Lambda> createLambda(PSexpr params, PSexpr forms) = 0;
 	virtual shared_ptr<Symbol> createSymbol(const gstring& symName) = 0;
+	virtual shared_ptr<String> createString(const gstring& symName) = 0;
 
 	template<class SexprChild1, class SexprChild2>
 	shared_ptr<Cons> createCons(SexprChild1& sexpr1OrChild, SexprChild2& sexpr2OrChild) {

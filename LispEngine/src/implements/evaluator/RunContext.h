@@ -35,8 +35,24 @@ public:
 		program = diBuilder->createProgram(*this/**diBuilder*/);
 	}
 
-	virtual void evalForm(PSexpr& sexpr, ICallResult& callRes) override {
+	virtual void setQuit() override {
+		evaluator.setQuit();
+	}
+
+	//virtual void evalForm(PSexpr& sexpr, ICallResult& callRes) override {
+	//	evaluator.evalForm(sexpr, callRes);
+	//}
+
+	virtual void evalForm(PSexpr& sexpr, shared_ptr<ICallResult>& callRes) override {
 		evaluator.evalForm(sexpr, callRes);
+	}
+
+	virtual void evalSexprStr(gstring& sexprStr, ICallResult& callRes) override {
+		evaluator.evalSexprStr(sexprStr, callRes);
+	}
+
+	virtual void evalSexprStr(gstring& sexprStr, shared_ptr<ICallResult>& callRes) override {
+		evaluator.evalSexprStr(sexprStr, callRes);
 	}
 
 	virtual uint8_t getLevel() override {

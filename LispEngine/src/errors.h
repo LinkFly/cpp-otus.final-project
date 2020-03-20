@@ -12,7 +12,7 @@
 using std::map;
 
 enum class EErrorCode {
-	noError, badArg, symbolNotExists, symbolUnbound
+	noError, badArg, symbolNotExists, symbolUnbound, argNotStr, badFileReaded
 };
 
 class Error : public CClass {
@@ -44,7 +44,16 @@ using ErrorCallback = std::function<void(shared_ptr<Error>& error)>;
 class ErrorBadArg : public Error {
 public:
 	ErrorBadArg() : Error(gstring{ "Bad arg" }, EErrorCode::badArg) {}
-	
+};
+
+class ErrorArgNotStr : public Error {
+public:
+	ErrorArgNotStr() : Error(gstring{ "Argument is not string" }, EErrorCode::argNotStr) {}
+};
+
+class ErrorBadFileReaded : public Error {
+public:
+	ErrorBadFileReaded() : Error(gstring{ "Failed file readed" }, EErrorCode::badFileReaded) {}
 };
 
 class ErrorSymbolUnbound : public Error {

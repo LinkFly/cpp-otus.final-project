@@ -21,7 +21,7 @@ enum class Ops {
 };
 
 enum class LikeType {
-	unknown, list, symbol, number
+	unknown, list, symbol, number, string
 };
 
 struct GCharDiap {
@@ -96,13 +96,16 @@ struct CharPredicats : public CClass {
 		return ch == '+' || ch == '-' || ch == '/' || ch == '*';
 	}
 	bool isWhitespace(gchar ch) {
-		return ch == ' ' || ch == '\t' || ch == '/n';
+		return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\x10';
 	}
 	bool isOpenParent(gchar ch) {
 		return ch == '(';
 	}
 	bool isCloseParent(gchar ch) {
 		return ch == ')';
+	}
+	bool isDbQuotes(gchar ch) {
+		return ch == '"';
 	}
 };
 class Reader : public IReader, public CClass {
@@ -127,6 +130,20 @@ class Reader : public IReader, public CClass {
 					ctx.curToken += gstring{ ch };
 				}
 			}
+			else if (preds.isDbQuotes(ch)) {
+				if (ctx.state == ReadState::none) {
+					ctx.state = ReadState::startToken;
+					ctx.likeType = LikeType::string;
+				}
+				else if (ctx.state == ReadState::startToken) {
+					fnTokenReaded(ctx);
+					ctx.reset();
+					if (ctx.likeType != LikeType::string) {
+						ctx.likeType = LikeType::string;
+						ctx.curToken = gstring{ ch };
+					}
+				}
+			}
 			else if (preds.isAlpha(ch) || preds.isSpec(ch)) {
 				if (ctx.state == ReadState::none) {
 					ctx.state = ReadState::startToken;
@@ -134,7 +151,9 @@ class Reader : public IReader, public CClass {
 					ctx.curToken = gstring{ ch };
 				}
 				else if (ctx.state == ReadState::startToken) {
-					ctx.likeType = LikeType::symbol;
+					if (ctx.likeType != LikeType::string) {
+						ctx.likeType = LikeType::symbol;
+					}
 					ctx.curToken += gstring{ ch };
 				}
 			}
@@ -154,6 +173,13 @@ class Reader : public IReader, public CClass {
 				}
 				else if (preds.isCloseParent(ch)) {
 					fnEndList();
+				}
+			}
+			else {
+				if (ctx.state == ReadState::startToken) {
+					if (ctx.likeType == LikeType::string) {
+						ctx.curToken += gstring{ ch };
+					}
 				}
 			}
 		}
@@ -197,6 +223,10 @@ public:
 		res = program.getProgramContext()->getScope()->get(token);
 		return res;
 	}
+
+	virtual PSexpr parseString(gstring token, IProgram& program) override {
+		return std::static_pointer_cast<Sexpr>(diBuilder.createString(token));
+	}
 	
 	virtual void read(gstring& programText, IProgram& program) {
 		/*sReaderContext ctx;*/
@@ -216,6 +246,13 @@ public:
 				cur = parseSymbol(ctx.curToken, program);
 				if (cur.get() == nullptr) {
 					cerr << "ERROR: Symbol `" << ctx.curToken << "` doesn't exists\n";
+					exit(-1);
+				}
+			}
+			else if (ctx.likeType == LikeType::string) {
+				cur = parseString(ctx.curToken, program);
+				if (cur.get() == nullptr) {
+					cerr << "ERROR: Failed parsing string: " << ctx.curToken << "\n";
 					exit(-1);
 				}
 			}

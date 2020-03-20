@@ -23,6 +23,15 @@ public:
 	virtual PSexpr& get(const gstring& name) override {
 		return (*nsTable)[name];
 	}
+	virtual PSexpr& find(const gstring& name) override {
+		auto it = nsTable->find(name);
+		if (it != nsTable->end()) {
+			return it->second;
+		}
+		else {
+			return parentScope->find(name);
+		}
+	}
 	virtual void setParentScope(shared_ptr<IScope> parentScope) override {
 		this->parentScope = parentScope;
 	}

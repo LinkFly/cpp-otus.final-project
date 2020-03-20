@@ -31,6 +31,9 @@ public:
 			std::getline(cin, cmd);
 			//cin >> cmd;
 			handler(cmd);
+			if (lispEngine.getQuit()) {
+				break;
+			}
 			outCommandPrompt(*ctx);
 		}
 	}

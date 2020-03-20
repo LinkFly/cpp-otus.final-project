@@ -63,7 +63,8 @@ class ILispFunction : public LispFunctionBase {
 
 public:
 	//virtual LispFunction(IProgram)
-	virtual void call(IRunContext& ctx, ArgsList& args, ICallResult& result) = 0;
+	virtual void call(IRunContext& ctx, ArgsList& args, shared_ptr<ICallResult>& res) = 0;
+	/*virtual void callConcrete(IRunContext& ctx, ArgsList& args, ICallResult& result) {}*/
 	virtual ~ILispFunction() {
 
 	}

@@ -85,6 +85,7 @@ public:
 	}
 
 	shared_ptr<Nil> createNil() {
+		// TODO!!! Use singleton
 		return make_shared<Nil>();
 	}
 
@@ -100,6 +101,10 @@ public:
 
 	shared_ptr<Symbol> createSymbol(const gstring& symName) {
 		return shared_ptr<Symbol>(new Symbol(symName));
+	}
+
+	virtual shared_ptr<String> createString(const gstring& str) override {
+		return std::static_pointer_cast<String>(make_shared<String>(str));
 	}
 
 	template<>
@@ -135,8 +140,8 @@ public:
 		return std::dynamic_pointer_cast<IProgram>(make_shared<Program>(*this, ctx));
 	}
 
-	shared_ptr<IEvaluator> createEvaluator() {
-		return std::dynamic_pointer_cast<IEvaluator>(make_shared<Evaluator>(*this));
+	shared_ptr<IEvaluator> createEvaluator(ILispEngine* lispEngine = nullptr) {
+		return std::dynamic_pointer_cast<IEvaluator>(make_shared<Evaluator>(*this, lispEngine));
 	}
 
 	virtual shared_ptr<IRunContext> createRunContext(IEvaluator& evaluator) override {
@@ -221,6 +226,16 @@ public:
 	template<>
 	shared_ptr<ApplyLispFunction> create<ApplyLispFunction>() {
 		return make_shared<ApplyLispFunction>();
+	}
+
+	template<>
+	shared_ptr<LoadLispFunction> create<LoadLispFunction>() {
+		return make_shared<LoadLispFunction>();
+	}
+
+	template<>
+	shared_ptr<QuitLispFunction> create<QuitLispFunction>() {
+		return make_shared<QuitLispFunction>();
 	}
 	
 };

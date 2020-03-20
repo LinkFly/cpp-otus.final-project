@@ -48,4 +48,8 @@ public:
 			deleter();
 		}*/
 	}
+
+	virtual void operator=(ICallResult& callRes) = 0;
+	
+	virtual Number& getNumberResult() = 0;
 };

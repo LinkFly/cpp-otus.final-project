@@ -20,8 +20,8 @@ class LispEngine : public ILispEngine, public CClass, public LispEngineBase {
 	shared_ptr<IScope> scope = diBuilder.createScope();
 	shared_ptr<IScope> fnScope = diBuilder.createScope();
 	/*shared_ptr<IProgram> program = diBuilder.createProgram(idiBuilder);*/
-	shared_ptr<IEvaluator> evaluator = diBuilder.createEvaluator();
-	shared_ptr<IEvaluator> topLevelEvaluator = diBuilder.createEvaluator();
+	shared_ptr<IEvaluator> evaluator = diBuilder.createEvaluator(this);
+	shared_ptr<IEvaluator> topLevelEvaluator = diBuilder.createEvaluator(this);
 	shared_ptr<SetfSymbolFunction> setfSymbolFunction = diBuilder.create<SetfSymbolFunction>();
 	shared_ptr<Nil> nil = diBuilder.createNil();
 	shared_ptr<Printer> printer = diBuilder.createPrinter();
@@ -29,7 +29,8 @@ class LispEngine : public ILispEngine, public CClass, public LispEngineBase {
 	ErrorCallback errCallback;
 
 	Global global = Global{};
-
+	
+	bool isQuit = false;
 public:
 	/*static Global* global;*/
 	//static shared_ptr<Global> global;
@@ -38,6 +39,13 @@ public:
 	//	global = make_shared<Global>();
 	//}
 	
+	virtual void setQuit() override {
+		isQuit = true;
+	}
+
+	virtual bool getQuit() override {
+		return isQuit;
+	}
 
 	ErrorCallback& getErrorCallback() {
 		return errCallback;
@@ -73,7 +81,7 @@ public:
 		PSexpr plusFuncSexpr = std::static_pointer_cast<Sexpr>(plusFunction);
 		ArgsList args(symSexpr, plusFuncSexpr);
 		shared_ptr<ICallResult> callRes = diBuilder.createCallResult();
-		setfSymbolFunction->call(*getGlobal().getTopLevelRunContext(), args, *callRes);
+		setfSymbolFunction->call(*getGlobal().getTopLevelRunContext(), args, callRes);
 	}
 
 	void registerSymbolValue(const gstring& symName, PSexpr& value) {
@@ -173,7 +181,8 @@ public:
 		registerLispFunction<EvalLispFunction>("eval");
 		registerLispFunction<LambdaLispFunction>("lambda");
 		registerLispFunction<ApplyLispFunction>("apply");
-		
+		registerLispFunction<LoadLispFunction>("load");
+		registerLispFunction<QuitLispFunction>("quit");
 		
 		//////
 
@@ -196,9 +205,10 @@ public:
 		}
 		return ctx->getProgram();
 	}
-	void evalProgram() {
+
+	void evalProgram(shared_ptr<ICallResult> callRes = nullptr) {
 		auto& program = getProgram();
-		evaluator->eval(*program.get(), [this](shared_ptr<Error>& err) {
+		evaluator->eval(*program.get(), callRes, [this](shared_ptr<Error>& err) {
 			createRunContext(true);
 
 			repl->printError(err);
@@ -208,6 +218,9 @@ public:
 			repl->run(ctx);
 			});
 	}
+	//void evalProgram() {
+	//	
+	//}
 
 	template<class ConcreteSexpr>
 	ConcreteSexpr& getLastResult() {
@@ -217,6 +230,10 @@ public:
 
 	virtual PSexpr getLastPSexprRes() override {
 		return evaluator->getLastResult().getResult();
+	}
+
+	virtual shared_ptr<ICallResult> getLastCallResult() override {
+		return evaluator->getPLastResult();
 	}
 
 	gstring princ(PSexpr& res) {
@@ -231,6 +248,14 @@ public:
 		createRunContext(false);
 		readProgram(sexprStr);
 		evalProgram();
+		/*return (*printer)(getLastPSexprRes());*/
+		return "";
+	}
+
+	virtual gstring evalSexprStr(gstring& sexprStr, shared_ptr<ICallResult> callRes) override {
+		createRunContext(false);
+		readProgram(sexprStr);
+		evalProgram(callRes);
 		/*return (*printer)(getLastPSexprRes());*/
 		return "";
 	}

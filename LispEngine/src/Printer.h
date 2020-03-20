@@ -33,6 +33,17 @@ public:
 		if (sexpr->isFunction()) {
 			return "<function>";
 		}
+		if (sexpr->isSymbol()) {
+			auto sym = std::static_pointer_cast<Symbol>(sexpr);
+			if (sym->getSelfEval()) {
+				return sym->getName();
+			}
+			return "<unbound symbol `" + sym->getName() + "`>";
+		}
+		if (sexpr->isString()) {
+			auto str = std::static_pointer_cast<String>(sexpr);
+			return gstring{ "\"" } + str->getValue() + gstring{ "\"" };
+		}
 		return "<unknown>";
 	}
 };

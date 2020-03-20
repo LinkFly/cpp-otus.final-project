@@ -66,4 +66,13 @@ public:
 	virtual void setStatus(EResultStatus status) override {
 		this->status = status;
 	}
+
+	virtual void operator=(ICallResult& callRes) override {
+		status = callRes.getStatus();
+		lastError = callRes.getLastError();
+	}
+
+	virtual Number& getNumberResult() override {
+		return getConcreteResult<Number>();
+	}
 };

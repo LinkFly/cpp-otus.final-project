@@ -47,14 +47,14 @@ bool trivial_test() {
 
 
 		PlusLispFunction plus;
-		CallResult res;
+		shared_ptr<ICallResult> res = diBuilder.createCallResult();
 		shared_ptr<IEvaluator> evaluator = diBuilder.createEvaluator();
 		shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*evaluator);
 		plus.call(
 			*ctx,
 			ArgsList(num, num2),
 			res);
-		Number& numRes = res.getConcreteResult<Number>();
+		Number& numRes = res->getNumberResult();
 		return numRes.getValue() == waitRes;
 	});
 }
@@ -299,6 +299,17 @@ bool apply_lambda_test() {
 		});
 }
 
+//C:\learn-build\project-work\LispEngine\tests\fixtures\for-load-trivial.lisp
+bool load_trivial_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		int64_t waitNum = 42;
+		lisp.evalSexprStr(gstring{ "(load \"C:\\learn-build\\project-work\\LispEngine\\tests\\fixtures\\for-load-trivial.lisp\")" });
+		auto res = lisp.getLastResult<Number>();
+		return waitNum == res.getValue();
+		});
+}
+
 void init_base_fixtures() {
 	// Init code must be here
 
@@ -332,5 +343,6 @@ BOOST_AUTO_TEST_CASE(test_of_lisp_engine)
 	BOOST_CHECK(lambda_trivial_test());
 	BOOST_CHECK(apply_trivial_test());
 	BOOST_CHECK(apply_lambda_test());
+	BOOST_CHECK(load_trivial_test());
 }
 BOOST_AUTO_TEST_SUITE_END()

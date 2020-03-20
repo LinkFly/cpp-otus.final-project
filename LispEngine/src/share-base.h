@@ -57,6 +57,7 @@ class Number;
 class Nil;
 class Lambda;
 class Symbol;
+class String;
 class Cons;
 
 class Printer;
