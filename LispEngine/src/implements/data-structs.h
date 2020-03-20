@@ -489,7 +489,7 @@ public:
 			cons = std::static_pointer_cast<Cons>(cons->cdr());
 		}
 		
-		getGlobal().getRunContext()->debugPrint(res);
+		//getGlobal().getRunContext()->debugPrint(res);
 		return res;
 	}
 
@@ -497,10 +497,10 @@ public:
 		shared_ptr<IRunContext>& ctx = getRunContext();
 		auto params = getParams();
 		cout << endl;
-		getGlobal().getRunContext()->debugPrint(params);
+		//getGlobal().getRunContext()->debugPrint(params);
 		auto forms = getForms();
 		cout << endl;
-		getGlobal().getRunContext()->debugPrint(forms);
+		//getGlobal().getRunContext()->debugPrint(forms);
 
 		//getGlobal().evaluator->
 
@@ -522,7 +522,7 @@ public:
 		//ctx->debugPrint(letForm);
 		auto formForEval = std::static_pointer_cast<Sexpr>(letForm);
 		cout << endl << endl;
-		getGlobal().getRunContext()->debugPrint(formForEval);
+		//getGlobal().getRunContext()->debugPrint(formForEval);
 		ctx->evalForm(formForEval, result);
 	}
 

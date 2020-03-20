@@ -267,15 +267,15 @@ class ApplyLispFunction: public LispFunction{
 public:
 	void call(IRunContext& ctx, ArgsList& args, shared_ptr<ICallResult>& res) override {
 		auto symOrFunc = args.get(0);
-		ctx.debugPrint(symOrFunc);
+		//ctx.debugPrint(symOrFunc);
 		symOrFunc = evalArg(ctx, symOrFunc, res);
 		if (res->getStatus() != EResultStatus::success) {
 			return;
 		}
 		auto argsForFn = args.get(1);
-		ctx.debugPrint(argsForFn);
+		//ctx.debugPrint(argsForFn);
 		argsForFn = evalArg(ctx, argsForFn, res);
-		ctx.debugPrint(argsForFn);
+		//ctx.debugPrint(argsForFn);
 		if (res->getStatus() != EResultStatus::success) {
 			return;
 		}
