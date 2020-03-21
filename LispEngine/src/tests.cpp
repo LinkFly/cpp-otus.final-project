@@ -304,7 +304,7 @@ bool load_trivial_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		LispEngine lisp;
 		int64_t waitNum = 42;
-		lisp.evalSexprStr(gstring{ "(load \"C:\\learn-build\\project-work\\LispEngine\\tests\\fixtures\\for-load-trivial.lisp\")" });
+		lisp.evalSexprStr(gstring{ "(load \"..\\tests\\fixtures\\for-load-trivial.lisp\")" });
 		auto res = lisp.getLastResult<Number>();
 		return waitNum == res.getValue();
 		});
