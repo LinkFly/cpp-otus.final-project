@@ -32,9 +32,6 @@
 #include "../Printer.h"
 #include "../repl.h"
 
-// test
-#include "../test.h"
-
 //namespace di = boost::di;
 using std::map;
 using std::shared_ptr;
@@ -61,12 +58,12 @@ public:
 		exit(-1);
 	}
 
-	template<>
-	shared_ptr<ITest> create<ITest>(int i, double d) {
-		//ITest* ptr = new CTest(i, d);
-		//return shared_ptr<ITest>(ptr);
-		return make_shared<CTest>(i, d);
-	}
+	//template<>
+	//shared_ptr<ITest> create<ITest>(int i, double d) {
+	//	//ITest* ptr = new CTest(i, d);
+	//	//return shared_ptr<ITest>(ptr);
+	//	return make_shared<CTest>(i, d);
+	//}
 
 	template<>
 	shared_ptr<Number> create<Number>(int32_t num) {
@@ -289,4 +286,9 @@ public:
 		return make_shared<TagbodyLispFunction>();
 	}
 	
+	template<>
+	shared_ptr<PrintLispFunction> create<PrintLispFunction>() {
+		return make_shared<PrintLispFunction>();
+	}
+
 };

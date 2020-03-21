@@ -1,37 +1,24 @@
 ﻿#include <iostream>
 #include <memory>
 
+#include "Arguments.h"
 #include "LispEngine.h"
-
-// test
-#include "test.h"
-//#include "interfaces/IDIBuilder.h"
-
 
 using std::cout;
 using std::endl;
 
 int main(int argc, char** argv) {
-	//DIBuilder diBuilder;
-	//shared_ptr<ITest> test = diBuilder->create<ITest>(3, 3.3);
-	//test->doIt();
-
 	LispEngine lisp;
 
-	////lisp.readProgram(gstring{ "(plus 32 6)" });
-	//lisp.readProgram(gstring{ "(plus (plus 30 2) 6)" });
-	//lisp.evalProgram();
-	//Number& numRes = lisp.getLastResult<Number>();
-
-	//cout << numRes.getValue() << endl;
-	//cout << endl << endl;
-
-	/*Repl repl;
-	DIBuilder diBuilder;
-	auto evaluator = diBuilder.createEvaluator();
-	shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*evaluator);
-	repl.run(ctx);*/
-
-	lisp.runRepl();
-
+	Arguments arguments{};
+	arguments.parse(argc, argv);
+	if (arguments.file != "") {
+		lisp.evalSexprStr("(load \"" + arguments.file + "\")");
+	}
+	if (arguments.sexprStr != "") {
+		lisp.evalSexprStr(arguments.sexprStr);
+	}
+	if (arguments.file == "" && arguments.sexprStr == "") {
+		lisp.runRepl();
+	}
 }

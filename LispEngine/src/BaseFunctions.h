@@ -11,6 +11,7 @@
 #include "interfaces/evaluator/ICallResult.h"
 
 #include "implements/evaluator/Program.h"
+#include "Printer.h"
 #include "System.h"
 
 using std::map;
@@ -481,12 +482,24 @@ public:
 			++idx;
 		}
 
+		auto t = ctx.getProgram()->getProgramContext()->getScope()->find("nil");
+		res->setResult(t, nullptr);
+	}
+};
 
-
-
-
-
-
+class PrintLispFunction : public LispFunction {
+public:
+	void call(IRunContext& ctx, ArgsList& args, shared_ptr<ICallResult>& res) override {
+		auto arg = args.get(0);
+		arg = evalArg(ctx, arg, res);
+		if (res->getStatus() != EResultStatus::success) {
+			return;
+		}
+		// TODO!!! Getting printer from context;
+		Printer printer{};
+		gstring resStr = printer(arg);
+		cout << resStr << endl;
+		//auto diBuilder = ctx.getDIBuilder();
 		auto t = ctx.getProgram()->getProgramContext()->getScope()->find("t");
 		res->setResult(t, nullptr);
 	}

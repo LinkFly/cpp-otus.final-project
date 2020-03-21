@@ -198,6 +198,7 @@ public:
 		//////
 
 		registerLispFunction<TagbodyLispFunction>("tagbody");
+		registerLispFunction<PrintLispFunction>("print");
 
 		registerSymbolSelfEvaluated("t");
 		registerSymbolSelfEvaluated("nil");

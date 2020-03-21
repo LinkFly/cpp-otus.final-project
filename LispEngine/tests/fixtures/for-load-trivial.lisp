@@ -1,1 +1,1 @@
-(plus 40 2)
+(print (plus 40 2))
