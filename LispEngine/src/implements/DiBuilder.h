@@ -178,6 +178,21 @@ public:
 	}
 
 	template<>
+	shared_ptr<MinusLispFunction> create<MinusLispFunction>() {
+		return make_shared<MinusLispFunction>();
+	}
+
+	template<>
+	shared_ptr<MultipleLispFunction> create<MultipleLispFunction>() {
+		return make_shared<MultipleLispFunction>();
+	}
+
+	template<>
+	shared_ptr<DivideLispFunction> create<DivideLispFunction>() {
+		return make_shared<DivideLispFunction>();
+	}
+
+	template<>
 	shared_ptr<CarLispFunction> create<CarLispFunction>() {
 		return make_shared<CarLispFunction>();
 	}

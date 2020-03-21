@@ -11,8 +11,10 @@
 #include "implements/evaluator/Program.h"
 #include "System.h"
 
-class PlusLispFunction : public LispFunction {
+class ArithmBaseLispFunction : public LispFunction {
 public:
+	virtual shared_ptr<Number> arithmOperation(Number* one, Number* two) = 0;
+
 	void call(IRunContext& ctx, ArgsList& args, shared_ptr<ICallResult>& res) override {
 		PSexpr arg1 = args.get(0);
 		arg1 = evalArg(ctx, arg1, res);
@@ -20,29 +22,47 @@ public:
 			return;
 		}
 		auto oneArg = reinterpret_cast<Number*>(arg1.get());
-		/*if (oneArg == nullptr) {
-			auto error = make_shared<ErrorBadArg>();
-			res->setErrorResult(error);
-			return;
-		}*/
+
 		PSexpr arg2 = args.get(1);
 		arg2 = evalArg(ctx, arg2, res);
 		if (res->getStatus() != EResultStatus::success) {
 			return;
 		}
 		auto twoArg = reinterpret_cast<Number*>(arg2.get());
-		/*if (oneArg == nullptr || twoArg == nullptr) {
-			cerr << "Bad args\n";
-			exit(-1);
-		}*/
-		//Sexpr* resNumber = new Number(oneArg->getValue() + twoArg->getValue());
-		shared_ptr<Sexpr> resNumber = std::static_pointer_cast<Sexpr>(
-			make_shared<Number>(oneArg->getValue() + twoArg->getValue()));
-		res->setResult(resNumber, nullptr /*[resNumber]() {
-			delete resNumber;
-			}*/);
+
+		shared_ptr<Sexpr> resNumber = std::static_pointer_cast<Sexpr>(arithmOperation(oneArg, twoArg));
+		/*shared_ptr<Sexpr> resNumber = std::static_pointer_cast<Sexpr>(
+			make_shared<Number>(oneArg->getValue() + twoArg->getValue()));*/
+		res->setResult(resNumber, nullptr);
 	}
-	//asdf
+};
+
+class PlusLispFunction : public ArithmBaseLispFunction {
+public:
+	virtual shared_ptr<Number> arithmOperation(Number* oneArg, Number* twoArg) override {
+		return make_shared<Number>(oneArg->getValue() + twoArg->getValue());
+	}
+};
+
+class MinusLispFunction : public ArithmBaseLispFunction {
+public:
+	virtual shared_ptr<Number> arithmOperation(Number* oneArg, Number* twoArg) override {
+		return make_shared<Number>(oneArg->getValue() - twoArg->getValue());
+	}
+};
+
+class MultipleLispFunction : public ArithmBaseLispFunction {
+public:
+	virtual shared_ptr<Number> arithmOperation(Number* oneArg, Number* twoArg) override {
+		return make_shared<Number>(oneArg->getValue() * twoArg->getValue());
+	}
+};
+
+class DivideLispFunction : public ArithmBaseLispFunction {
+public:
+	virtual shared_ptr<Number> arithmOperation(Number* oneArg, Number* twoArg) override {
+		return make_shared<Number>(oneArg->getValue() / twoArg->getValue());
+	}
 };
 
 class CarLispFunction : public LispFunction {

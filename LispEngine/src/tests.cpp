@@ -310,6 +310,16 @@ bool load_trivial_test() {
 		});
 }
 
+bool other_arithm_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		int64_t waitNum = 42;
+		lisp.evalSexprStr(gstring{ "(- 50 (* (/ 16 4) 2))" });
+		auto res = lisp.getLastResult<Number>();
+		return waitNum == res.getValue();
+		});
+}
+
 void init_base_fixtures() {
 	// Init code must be here
 
@@ -344,5 +354,6 @@ BOOST_AUTO_TEST_CASE(test_of_lisp_engine)
 	BOOST_CHECK(apply_trivial_test());
 	BOOST_CHECK(apply_lambda_test());
 	BOOST_CHECK(load_trivial_test());
+	BOOST_CHECK(other_arithm_test());
 }
 BOOST_AUTO_TEST_SUITE_END()

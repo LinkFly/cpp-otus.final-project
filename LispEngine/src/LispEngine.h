@@ -170,6 +170,10 @@ public:
 		getGlobal().getTopLevelRunContext()->getProgram()->getProgramContext()->setFnScope(fnScope);
 		
 		registerLispFunction<PlusLispFunction>("plus");
+		registerLispFunction<PlusLispFunction>("+");
+		registerLispFunction<MinusLispFunction>("-");
+		registerLispFunction<MultipleLispFunction>("*");
+		registerLispFunction<DivideLispFunction>("/");
 		
 		registerLispFunction<CarLispFunction>("car");
 		registerLispFunction<CdrLispFunction>("cdr");
@@ -244,20 +248,16 @@ public:
 		evaluator->createRunContext(scope, fnScope, isNewDebugLevel);
 	}
 
-	gstring evalSexprStr(gstring& sexprStr) override {
+	void evalSexprStr(gstring& sexprStr) override {
 		createRunContext(false);
 		readProgram(sexprStr);
 		evalProgram();
-		/*return (*printer)(getLastPSexprRes());*/
-		return "";
 	}
 
-	virtual gstring evalSexprStr(gstring& sexprStr, shared_ptr<ICallResult> callRes) override {
+	virtual void evalSexprStr(gstring& sexprStr, shared_ptr<ICallResult> callRes) override {
 		createRunContext(false);
 		readProgram(sexprStr);
 		evalProgram(callRes);
-		/*return (*printer)(getLastPSexprRes());*/
-		return "";
 	}
 
 	virtual Printer getPrinter() override {
