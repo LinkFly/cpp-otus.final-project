@@ -424,7 +424,7 @@ public:
 		res->setResult(nil, nullptr);
 
 		vector<PSexpr> forms;
-		map<gstring, int> points;
+		map<gstring, size_t> points;
 		bool isHandleNext = false;
 		bool isWasPoint = false;
 		gstring curPoint;
@@ -458,7 +458,7 @@ public:
 			}
 		}
 		///////// Evaluating saved forms //////////
-		int idx = 0;
+		size_t idx = 0;
 		gstring goSymName = "go";
 		while (true) {
 			if (idx >= forms.size())

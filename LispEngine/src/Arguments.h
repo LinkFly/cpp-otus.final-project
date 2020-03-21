@@ -75,7 +75,7 @@ struct Arguments {
         std::cout << *desc << std::endl;
     }
 
-    void check_arguments(const po::variables_map& vm) throw(std::exception)
+    void check_arguments(const po::variables_map& vm) //throw(std::exception)
     {
         /*if (blockSize == 0) {
             throw MyException("Failed: --block-size must be > 0");
