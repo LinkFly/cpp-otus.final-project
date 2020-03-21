@@ -314,7 +314,13 @@ bool other_arithm_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		LispEngine lisp;
 		int64_t waitNum = 42;
-		lisp.evalSexprStr(gstring{ "(- 50 (* (/ 16 4) 2))" });
+		lisp.evalSexprStr(gstring{
+"(- 50 "
+"	(*"
+"		(/ 16 (+ 3 1))"
+"		2)"
+")"
+			});
 		auto res = lisp.getLastResult<Number>();
 		return waitNum == res.getValue();
 		});
@@ -371,6 +377,35 @@ bool predicates_test() {
 		});
 }
 
+bool tagbody_trivial_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		int64_t waitNum = 15;
+		lisp.evalSexprStr(gstring{
+"(let ((val nil))"
+"	(tagbody"
+"	  (setq val 1)"
+"	  (go point-a)"
+"	  (setq val (+ val 16))"
+"	 point-c"
+"	  (setq val (+ val 4))"
+"	  (go point-b)"
+"	  (setq val (+ val 32))"
+"	 point-a"
+"	  (setq val (+ val 2))"
+"	  (go point-c)"
+"	  (setq val (+ val 64))"
+"	 point-b"
+"	  (setq val (+ val 8)))"
+"	val)"
+			});
+		auto res = lisp.getLastPSexprRes();
+		auto numRes = static_cast<Number*>(res.get())->getValue();
+		return waitNum == numRes;
+
+		});
+}
+
 void init_base_fixtures() {
 	// Init code must be here
 
@@ -407,5 +442,6 @@ BOOST_AUTO_TEST_CASE(test_of_lisp_engine)
 	BOOST_CHECK(load_trivial_test());
 	BOOST_CHECK(other_arithm_test());
 	BOOST_CHECK(predicates_test());
+	BOOST_CHECK(tagbody_trivial_test());
 }
 BOOST_AUTO_TEST_SUITE_END()

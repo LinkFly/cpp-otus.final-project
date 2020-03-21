@@ -29,7 +29,11 @@ public:
 			return it->second;
 		}
 		else {
-			return parentScope->find(name);
+			PSexpr res;
+			if (parentScope.get() != nullptr) {
+				res = parentScope->find(name);
+			}
+			return res;
 		}
 	}
 	virtual void setParentScope(shared_ptr<IScope> parentScope) override {

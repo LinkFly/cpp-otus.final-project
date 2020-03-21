@@ -3,6 +3,8 @@
 #include "share.h"
 
 //
+#include <vector>
+#include <map>
 
 //#include "interfaces/evaluator/IProgram.h"
 #include "interfaces/evaluator/IRunContext.h"
@@ -10,6 +12,9 @@
 
 #include "implements/evaluator/Program.h"
 #include "System.h"
+
+using std::map;
+using std::vector;
 
 class ArithmBaseLispFunction : public LispFunction {
 public:
@@ -407,5 +412,82 @@ class FunctionpLispFunction : public PredicateBaseLispFunction {
 class StringpLispFunction : public PredicateBaseLispFunction {
 	virtual bool checkSepxr(PSexpr& sexpr) override {
 		return sexpr->isString();
+	}
+};
+
+class TagbodyLispFunction : public LispFunction {
+public:
+	void call(IRunContext& ctx, ArgsList& args, shared_ptr<ICallResult>& res) override {
+		auto diBuilder = ctx.getDIBuilder();
+		auto nil = diBuilder->createNil();
+		res->setResult(nil, nullptr);
+
+		vector<PSexpr> forms;
+		map<gstring, int> points;
+		bool isHandleNext = false;
+		bool isWasPoint = false;
+		gstring curPoint;
+		for (int i = 0; i < args.size(); ++i) {
+			auto curArg = args.get(i);
+			if (curArg->isCons()) {
+				/*if (!isWasPoint) {
+					evalArg(ctx, curArg, res);
+					if (res->getStatus() != EResultStatus::success) {
+						return;
+					}
+				}
+				else {*/
+				if (isHandleNext) {
+					forms.push_back(curArg);
+					auto curIdx = forms.size() - 1;
+					points[curPoint] = curIdx;
+					isHandleNext = false;
+				}
+				else {
+					forms.push_back(curArg);
+				}
+				//}
+
+			}
+			else if (curArg->isSymbol()) {
+				/*isWasPoint = true;*/
+				isHandleNext = true;
+				auto sym = std::static_pointer_cast<Symbol>(curArg);
+				curPoint = sym->getName();
+			}
+		}
+		///////// Evaluating saved forms //////////
+		int idx = 0;
+		gstring goSymName = "go";
+		while (true) {
+			if (idx >= forms.size())
+				break;
+			auto curForm = forms[idx];
+			auto cons = std::static_pointer_cast<Cons>(curForm);
+			auto car = cons->car();
+			if (car->isSymbol()) {
+				auto sym = std::static_pointer_cast<Symbol>(car);
+				if (sym->getName() == goSymName) {
+					auto cdrCons = std::static_pointer_cast<Cons>(cons->cdr());
+					auto symPoint = std::static_pointer_cast<Symbol>(cdrCons->car());
+					idx = points[symPoint->getName()];
+					continue;
+				}
+			}
+			evalArg(ctx, curForm, res);
+			if (res->getStatus() != EResultStatus::success) {
+				return;
+			}
+			++idx;
+		}
+
+
+
+
+
+
+
+		auto t = ctx.getProgram()->getProgramContext()->getScope()->find("t");
+		res->setResult(t, nullptr);
 	}
 };

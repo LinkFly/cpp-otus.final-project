@@ -195,20 +195,12 @@ public:
 		registerLispFunction<NumberpLispFunction>("numberp");
 		registerLispFunction<FunctionpLispFunction>("functionp");
 		registerLispFunction<StringpLispFunction>("stringp");
-		////// Predicated ////////
-/*
-		SymbolpLispFunction
-		AtompLispFunction
-		ConspLispFunction
-		NumberpLispFunction
-		FunctionpLispFunction
-		StringpLispFunction
-	//symbolp, atomp, consp, numberp, functionp, stringp
-*/
-		
 		//////
 
+		registerLispFunction<TagbodyLispFunction>("tagbody");
+
 		registerSymbolSelfEvaluated("t");
+		registerSymbolSelfEvaluated("nil");
 		registerSymbolValue("nil", std::static_pointer_cast<Sexpr>(nil));
 		
 	}

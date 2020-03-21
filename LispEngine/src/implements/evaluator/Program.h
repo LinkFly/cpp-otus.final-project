@@ -163,9 +163,17 @@ public:
 	//}
 
 	virtual PSexpr getSymByName(gstring symName) override {
-		shared_ptr<IPackage>& package = getPackage();
+		/*shared_ptr<IPackage>& package = getPackage();*/
 		/*return getProgramContext()->getScope()->get(symName);*/
-		return package->getSymbol(symName);
+		PSexpr res = getProgramContext()->getScope()->find(symName);
+		if (res.get() != nullptr) {
+			return res;
+		}
+		else {
+			shared_ptr<IPackage>& package = getPackage();
+			return package->getSymbol(symName);
+		}
+		
 	}
 
 	virtual shared_ptr<IProgram> getParentProgram() override {

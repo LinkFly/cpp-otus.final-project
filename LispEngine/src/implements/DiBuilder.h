@@ -283,5 +283,10 @@ public:
 	shared_ptr<StringpLispFunction> create<StringpLispFunction>() {
 		return make_shared<StringpLispFunction>();
 	}
+
+	template<>
+	shared_ptr<TagbodyLispFunction> create<TagbodyLispFunction>() {
+		return make_shared<TagbodyLispFunction>();
+	}
 	
 };
