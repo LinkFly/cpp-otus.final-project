@@ -252,5 +252,36 @@ public:
 	shared_ptr<QuitLispFunction> create<QuitLispFunction>() {
 		return make_shared<QuitLispFunction>();
 	}
+
+	//////////////////////
+	template<>
+	shared_ptr<SymbolpLispFunction> create<SymbolpLispFunction>() {
+		return make_shared<SymbolpLispFunction>();
+	}
+		
+	template<>
+	shared_ptr<AtompLispFunction> create<AtompLispFunction>() {
+		return make_shared<AtompLispFunction>();
+	}
+
+	template<>
+	shared_ptr<ConspLispFunction> create<ConspLispFunction>() {
+		return make_shared<ConspLispFunction>();
+	}
+
+	template<>
+	shared_ptr<NumberpLispFunction> create<NumberpLispFunction>() {
+		return make_shared<NumberpLispFunction>();
+	}
+
+	template<>
+	shared_ptr<FunctionpLispFunction> create<FunctionpLispFunction>() {
+		return make_shared<FunctionpLispFunction>();
+	}
+
+	template<>
+	shared_ptr<StringpLispFunction> create<StringpLispFunction>() {
+		return make_shared<StringpLispFunction>();
+	}
 	
 };

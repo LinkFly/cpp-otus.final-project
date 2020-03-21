@@ -356,3 +356,56 @@ public:
 		res->setResult(t, nullptr);
 	}
 };
+
+class PredicateBaseLispFunction : public LispFunction {
+protected:
+	virtual bool checkSepxr(PSexpr& sexpr) = 0;
+public:
+	void call(IRunContext& ctx, ArgsList& args, shared_ptr<ICallResult>& res) override {
+		/*auto diBuilder = ctx.getDIBuilder();*/
+		auto arg = args.get(0);
+		arg = evalArg(ctx, arg, res);
+		if (res->getStatus() != EResultStatus::success) {
+			return;
+		}
+		bool checkRes = checkSepxr(arg);
+		PSexpr resSexpr = ctx.getProgram()->getProgramContext()->getScope()->find(checkRes ? "t" : "nil");
+		res->setResult(resSexpr, nullptr);
+	}
+};
+
+class SymbolpLispFunction : public PredicateBaseLispFunction {
+	virtual bool checkSepxr(PSexpr& sexpr) override {
+		return sexpr->isSymbol();
+	}
+};
+
+class AtompLispFunction : public PredicateBaseLispFunction {
+	virtual bool checkSepxr(PSexpr& sexpr) override {
+		return sexpr->isAtom();
+	}
+};
+
+class ConspLispFunction : public PredicateBaseLispFunction {
+	virtual bool checkSepxr(PSexpr& sexpr) override {
+		return sexpr->isCons();
+	}
+};
+
+class NumberpLispFunction : public PredicateBaseLispFunction {
+	virtual bool checkSepxr(PSexpr& sexpr) override {
+		return sexpr->isNumber();
+	}
+};
+
+class FunctionpLispFunction : public PredicateBaseLispFunction {
+	virtual bool checkSepxr(PSexpr& sexpr) override {
+		return sexpr->isFunction();
+	}
+};
+
+class StringpLispFunction : public PredicateBaseLispFunction {
+	virtual bool checkSepxr(PSexpr& sexpr) override {
+		return sexpr->isString();
+	}
+};

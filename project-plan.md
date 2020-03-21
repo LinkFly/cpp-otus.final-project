@@ -9,7 +9,7 @@
 - Возможности к реализации (перечень сущностей языка, которые планируется реализовать в 
 проектной работе)
   - Реализация/выполнение run-time'а с базовыми функциями (работа ф-ии eval)
-    - OK типы: symbolp/atom/cons/number/function
+    - OK типы: symbol/atom/cons/number/function/string
     - ф-ии:
       - базовые:
           - OK управляющие вычислением: 
@@ -17,14 +17,14 @@
             - OK eval
             - OK apply
           - OK операции с данными: car, cdr, cons
-          - предикаты: symbolp, atomp, consp, numberp, functionp
+          - OK предикаты: symbolp, atomp, consp, numberp, functionp, stringp
           - OK работающие с контекстом вычисления:
             - OK let
             - OK lambda
           - управляющие:
             - OK if
             - tagbody
-          - арифметические: +, -, :, *
+          - OK арифметические: +, -, :, *
           - OK деформирующие: setq          
 
   - OK Загрузка файла c программой в run-time (ф-ия load)

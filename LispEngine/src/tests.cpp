@@ -320,6 +320,57 @@ bool other_arithm_test() {
 		});
 }
 
+bool predicates_test() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		LispEngine lisp;
+		
+
+		auto testPredOnTrue = [&lisp](gstring& sexprStr) {
+			gstring waitTrue = "t";
+			/*lisp.evalSexprStr(gstring{ "(symbolp (quote some))" });*/
+			lisp.evalSexprStr(sexprStr);
+			auto lastRes = lisp.getLastPSexprRes();
+			auto resIsSym = std::static_pointer_cast<Symbol>(lastRes);
+			bool isSym = waitTrue == resIsSym->getName();
+			return isSym;
+		};
+
+		auto testPredOnFalse = [&lisp](gstring& sexprStr) {
+			lisp.evalSexprStr(sexprStr);
+			auto lastRes = lisp.getLastPSexprRes();
+			return lastRes->isNil();
+		};
+		
+		bool isSym = testPredOnTrue(gstring{ "(symbolp (quote some))" });
+		bool isNotSym = testPredOnFalse(gstring{ "(symbolp 42)" });
+
+		bool isAtom = testPredOnTrue(gstring{ "(atomp t)" });
+		bool isNotAtom = testPredOnFalse(gstring{ "(atomp (cons t nil))" });
+
+		bool isCons = testPredOnTrue(gstring{ "(consp (cons t nil))" });
+		bool isNotCons = testPredOnFalse(gstring{ "(consp t)" });
+
+		//symbolp, atomp, consp, numberp, functionp, stringp
+		bool isNum = testPredOnTrue(gstring{ "(numberp 42)" });
+		bool isNotNum = testPredOnFalse(gstring{ "(numberp (car (cons t nil)))" });
+
+		bool isFunc = testPredOnTrue(gstring{ "(functionp (lambda (x y) (plus x y)))" });
+		bool isNotFunc = testPredOnFalse(gstring{ "(functionp (plus 3 4))" });
+
+		bool isString = testPredOnTrue(gstring{ "(stringp (car (cons \"this-str\" t)))" });
+		bool isNotString = testPredOnFalse(gstring{ "(stringp (lambda (x) x))" });
+
+
+		return isSym && isNotSym
+			&& isAtom && isNotAtom
+			&& isCons && isNotCons
+			&& isNum && isNotNum
+			&& isFunc && isNotFunc
+			&& isString && isNotString
+			;
+		});
+}
+
 void init_base_fixtures() {
 	// Init code must be here
 
@@ -355,5 +406,6 @@ BOOST_AUTO_TEST_CASE(test_of_lisp_engine)
 	BOOST_CHECK(apply_lambda_test());
 	BOOST_CHECK(load_trivial_test());
 	BOOST_CHECK(other_arithm_test());
+	BOOST_CHECK(predicates_test());
 }
 BOOST_AUTO_TEST_SUITE_END()

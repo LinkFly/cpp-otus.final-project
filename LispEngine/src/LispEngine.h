@@ -187,6 +187,24 @@ public:
 		registerLispFunction<ApplyLispFunction>("apply");
 		registerLispFunction<LoadLispFunction>("load");
 		registerLispFunction<QuitLispFunction>("quit");
+
+		// Predicates
+		registerLispFunction<SymbolpLispFunction>("symbolp");
+		registerLispFunction<AtompLispFunction>("atomp");
+		registerLispFunction<ConspLispFunction>("consp");
+		registerLispFunction<NumberpLispFunction>("numberp");
+		registerLispFunction<FunctionpLispFunction>("functionp");
+		registerLispFunction<StringpLispFunction>("stringp");
+		////// Predicated ////////
+/*
+		SymbolpLispFunction
+		AtompLispFunction
+		ConspLispFunction
+		NumberpLispFunction
+		FunctionpLispFunction
+		StringpLispFunction
+	//symbolp, atomp, consp, numberp, functionp, stringp
+*/
 		
 		//////
 
