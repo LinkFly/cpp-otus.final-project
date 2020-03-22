@@ -6,31 +6,31 @@
 
 //#include <boost/di.hpp>
 
-#include "../share.h"
+#include "../base/share.h"
 #include "../interfaces/IDIBuilder.h"
 
-#include "../interfaces/i-data-structs.h"
-#include "../interfaces/evaluator/IScope.h"
-#include "../interfaces/evaluator/IReader.h"
-#include "../interfaces/evaluator/IProgram.h"
-#include "../interfaces/evaluator/IEvaluator.h"
-#include "../interfaces/evaluator/IRunContext.h"
-#include "../interfaces/evaluator/ICallResult.h"
+#include "../interfaces/core/i-data-structs.h"
+#include "../interfaces/core/evaluator/IScope.h"
+#include "../interfaces/core/IReader.h"
+#include "../interfaces/core/evaluator/IProgram.h"
+#include "../interfaces/core/evaluator/IEvaluator.h"
+#include "../interfaces/core/evaluator/IRunContext.h"
+#include "../interfaces/core/evaluator/ICallResult.h"
 
-#include "../interfaces/ILispEngine.h"
+#include "../interfaces/core/ILispEngine.h"
 
-#include "../implements/data-structs.h"
-#include "../implements/evaluator/Program.h"
-#include "../implements/evaluator/Scope.h"
-#include "../implements/evaluator/Reader.h"
-#include "../implements/evaluator/Program.h"
-#include "../implements/evaluator/Evaluator.h"
-#include "../implements/evaluator/RunContext.h"
-#include "../implements/evaluator/CallResult.h"
+#include "../implements/core/data-structs.h"
+#include "../implements/core/evaluator/Program.h"
+#include "../implements/core/evaluator/Scope.h"
+#include "../implements/core/Reader.h"
+#include "../implements/core/evaluator/Program.h"
+#include "../implements/core/evaluator/Evaluator.h"
+#include "../implements/core/evaluator/RunContext.h"
+#include "../implements/core/evaluator/CallResult.h"
 
-#include "../BaseFunctions.h"
-#include "../Printer.h"
-#include "../repl.h"
+#include "../implements/core/evaluator/BaseFunctions.h"
+#include "../implements/core/Printer.h"
+#include "../implements/core/Repl.h"
 
 //namespace di = boost::di;
 using std::map;

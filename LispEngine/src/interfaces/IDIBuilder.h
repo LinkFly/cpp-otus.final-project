@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include "../share.h"
-#include "../interfaces/evaluator/IScope.h"
-#include "../interfaces/evaluator/IEvaluator.h"
+#include "../base/share.h"
+#include "../interfaces/core/evaluator/IScope.h"
+#include "../interfaces/core/evaluator/IEvaluator.h"
 //#include "../implements/data-structs.h"
 
 using std::shared_ptr;

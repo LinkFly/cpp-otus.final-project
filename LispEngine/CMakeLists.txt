@@ -8,40 +8,30 @@ project(lisp_engine VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 set(SOURCES
 	src/main.cpp
 	)
-set(HEADERS
-	src/share-base.h
-	src/Global.h
-	src/share.h
-	src/interfaces/evaluator/IProgram.h
-	src/interfaces/evaluator/IEvaluator.h
-	src/interfaces/i-data-structs.h
-	src/interfaces/IDIBuilder.h
 
-	src/BaseFunctions.h
+file(GLOB_RECURSE LISP_ENGINE_HEADERS
+    "src/*.h"
+)
 
-	src/implements/data-structs.h
-	src/implements/evaluator/Evaluator.h
-	src/implements/DIBuilder.h
-
-	src/LispEngine.h
-	)
-aux_source_directory(src/implements/evaluator, EVALUATOR)
 set(TEST_SOURCES
-	src/tests.cpp
+	tests/tests.cpp
 	)
+
 set(TESTS_HEADERS
 
 	)
+
 set(DATA_FILES
-	#Readme.md
+	../Readme.md
 
 	)
+
 option(LOGS "Enable output logs" false)
 configure_file(src/configure.h.in ../build/configure.h)
 
-add_executable(lisp_engine ${SOURCES} ${HEADERS} ${DATA_FILES})
+add_executable(lisp_engine ${SOURCES} ${DATA_FILES} ${LISP_ENGINE_HEADERS})
 #add_executable(lisp_engine-orig stub.cpp)
-add_executable(tests ${TEST_SOURCES} ${TESTS_HEADERS} ${HEADERS})
+add_executable(tests ${TEST_SOURCES} ${TESTS_HEADERS} ${LISP_ENGINE_HEADERS})
 #add_executable(tests-orig stub.cpp)
 set_target_properties(lisp_engine tests PROPERTIES
 	CXX_STANDARD 11
