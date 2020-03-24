@@ -38,12 +38,6 @@ public:
 	IDIBuilder*& getIDIBuilder() {
 		return this->diBuilder;
 	}
-	//DIBuilder* getDiBuilder() {
-	//	return reinterpret_cast<DIBuilder*>(this->diBuilder);
-	//}
-	/*shared_ptr<DIBuilder> getDiBuilder() {
-		return make_shared<DIBuilder>();
-	}*/
 
 	IMemoryManager& getMemoryManager() const {
 		return *memoryManager;
