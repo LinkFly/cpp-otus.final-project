@@ -34,25 +34,13 @@
 #include "../implements/core/Repl.h"
 
 using std::map;
-using std::shared_ptr;
-using std::make_shared;
 using std::vector;
 
 class DIBuilder : public IDIBuilder, public CClass {
 public:
 	DIBuilder() = default;
 
-	template<class T, typename ...Args>
-	shared_ptr<T> create(Args&... args) {
-		return make_shared<T>(args...);
-	}
-
-	template<class TInterface, class TImplement = TInterface, class ...Args>
-	shared_ptr<TInterface> bind(Args... args) {
-		return std::static_pointer_cast<TInterface>(make_shared<TImplement>(args...));
-	}
-
-	virtual shared_ptr<Number> createNumber(int32_t num) override {
+	virtual shared_ptr<Number> createNumber(int64_t num) override {
 		return create<Number>(num);
 	}
 
@@ -125,6 +113,10 @@ public:
 
 	virtual shared_ptr<ICallResult> createCallResult() override {
 		return bind<ICallResult, CallResult>();
+	}
+
+	virtual shared_ptr<ArgsList> createArgsList() override {
+		return create<ArgsList>();
 	}
 
 	template<class ConcreteLispFunction>

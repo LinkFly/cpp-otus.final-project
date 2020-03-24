@@ -267,7 +267,6 @@ public:
 		};
 		auto handleStartList = [this, &elemsStack, &listStack, &resSexpr, &isListStarted]() {
 			isListStarted = true;
-			/*auto pElemsList = make_shared<vector<PSexpr>>();*/
 			auto pElemsList = diBuilder.createPSexprCol();
 			
 			elemsStack.push(pElemsList);

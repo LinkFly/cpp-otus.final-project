@@ -30,13 +30,6 @@ class LispEngine : public ILispEngine, public CClass, public LispEngineBase {
 
 	bool isQuit = false;
 public:
-	/*static Global* global;*/
-	//static shared_ptr<Global> global;
-	//shared_ptr<Global> getGlobal() { return global; }
-	//void init() {
-	//	global = make_shared<Global>();
-	//}
-
 	LispEngine() : idiBuilder{ *(dynamic_cast<IDIBuilder*>(&diBuilder)) } {
 		setLispEngine(dynamic_cast<LispEngineBase*>(this));
 		global = Global{};

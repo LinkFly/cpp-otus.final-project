@@ -9,14 +9,8 @@
 using std::map;
 
 class Scope : public IScope, public CClass {
-	//friend class Scope;
-	
-	/*PNsMap nsTable = make_shared<NsMap>();*/
 	PNsMap nsTable = getGlobal().getIDIBuilder()->createNsMap();
-	
-	//shared_ptr<IScope> nextScope;
 	shared_ptr<IScope> parentScope;
-	//DIBuilder diBuilder;
 public:
 	Scope() {
 

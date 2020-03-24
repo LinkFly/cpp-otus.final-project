@@ -36,6 +36,7 @@ bool call_test(string name, std::function<bool(void)> fntest) {
 bool trivial_test() {
 	return call_test(__PRETTY_FUNCTION__, []() -> bool {
 		DIBuilder diBuilder;
+		LispEngine lispEngine;
 		//// Fixtures
 		int n1 = 42;
 		int n2 = 3;

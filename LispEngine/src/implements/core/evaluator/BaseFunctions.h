@@ -18,6 +18,10 @@ using std::map;
 using std::vector;
 
 class ArithmBaseLispFunction : public LispFunction {
+protected:
+	shared_ptr<Number> createNumber(int64_t num) {
+		return getDiBuilder()->createNumber(num);
+	}
 public:
 	virtual shared_ptr<Number> arithmOperation(Number* one, Number* two) = 0;
 
@@ -37,8 +41,6 @@ public:
 		auto twoArg = reinterpret_cast<Number*>(arg2.get());
 
 		shared_ptr<Sexpr> resNumber = std::static_pointer_cast<Sexpr>(arithmOperation(oneArg, twoArg));
-		/*shared_ptr<Sexpr> resNumber = std::static_pointer_cast<Sexpr>(
-			make_shared<Number>(oneArg->getValue() + twoArg->getValue()));*/
 		res->setResult(resNumber, nullptr);
 	}
 };
@@ -46,28 +48,28 @@ public:
 class PlusLispFunction : public ArithmBaseLispFunction {
 public:
 	virtual shared_ptr<Number> arithmOperation(Number* oneArg, Number* twoArg) override {
-		return make_shared<Number>(oneArg->getValue() + twoArg->getValue());
+		return createNumber(oneArg->getValue() + twoArg->getValue());
 	}
 };
 
 class MinusLispFunction : public ArithmBaseLispFunction {
 public:
 	virtual shared_ptr<Number> arithmOperation(Number* oneArg, Number* twoArg) override {
-		return make_shared<Number>(oneArg->getValue() - twoArg->getValue());
+		return createNumber(oneArg->getValue() - twoArg->getValue());
 	}
 };
 
 class MultipleLispFunction : public ArithmBaseLispFunction {
 public:
 	virtual shared_ptr<Number> arithmOperation(Number* oneArg, Number* twoArg) override {
-		return make_shared<Number>(oneArg->getValue() * twoArg->getValue());
+		return createNumber(oneArg->getValue() * twoArg->getValue());
 	}
 };
 
 class DivideLispFunction : public ArithmBaseLispFunction {
 public:
 	virtual shared_ptr<Number> arithmOperation(Number* oneArg, Number* twoArg) override {
-		return make_shared<Number>(oneArg->getValue() / twoArg->getValue());
+		return createNumber(oneArg->getValue() / twoArg->getValue());
 	}
 };
 
@@ -122,7 +124,7 @@ public:
 			cerr << "Bad args\n";
 			exit(-1);
 		}
-		res->setResult(make_shared<Cons>(oneArg, twoArg), nullptr);
+		res->setResult(createCons(oneArg, twoArg), nullptr);
 	}
 };
 
@@ -254,7 +256,7 @@ public:
 			return;
 		}
 		// TODO use diBuilder
-		res->setResult(make_shared<Nil>(), nullptr);
+		res->setResult(createNil(), nullptr);
 		// restore scope
 		scope =  scope->popScope();
 		setScope(ctx, scope);
@@ -280,7 +282,7 @@ public:
 
 class ApplyLispFunction: public LispFunction{
 	shared_ptr<ArgsList> getArgsList(PSexpr args) {
-		shared_ptr<ArgsList> argsList = make_shared<ArgsList>();
+		shared_ptr<ArgsList> argsList = createArgsList();
 		PSexpr curArgs = args;
 		while (!curArgs->isNil() && curArgs->isCons()) {
 			auto cons = std::static_pointer_cast<Cons>(curArgs);
@@ -325,13 +327,14 @@ public:
 class LoadLispFunction : public LispFunction {
 public:
 	void call(IRunContext& ctx, ArgsList& args, shared_ptr<ICallResult>& res) override {
+		auto diBuilder = ctx.getDIBuilder();
 		auto fstArg = args.get(0);
 		auto file = evalArg(ctx, fstArg, res);
 		if (res->getStatus() != EResultStatus::success) {
 			return;
 		}
 		if (!file->isString()) {
-			auto err = make_shared< ErrorArgNotStr>();
+			auto err = diBuilder->createError<ErrorArgNotStr>();
 			res->setErrorResult(err, nullptr);
 		}
 		auto str = std::static_pointer_cast<String>(file);
@@ -339,16 +342,12 @@ public:
 		gstring fileContent;
 		bool bReaded = System::readFile(filePath, fileContent);
 		if (!bReaded) {
-			auto err = make_shared<ErrorBadFileReaded>();
+			auto err = diBuilder->createError<ErrorBadFileReaded>();
 			res->setErrorResult(err, nullptr);
 			return;
 		}
-		auto diBuilder = ctx.getDIBuilder();
-		//auto callRes = diBuilder->createCallResult();
+		
 		ctx.evalSexprStr(fileContent, res);
-		/*res->setStatus(callRes->getStatus());
-		res->*/
-		/*res = *callRes;*/
 	}
 };
 

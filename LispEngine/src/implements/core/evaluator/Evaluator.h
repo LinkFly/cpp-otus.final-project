@@ -30,7 +30,8 @@ public:
 					auto boundedValue = sym->getValue();
 					if (boundedValue.get() == nullptr) {
 						auto symName = sym->getName();
-						callRes->setErrorResult(make_shared<ErrorSymbolUnbound>(symName));
+						auto& diBuilder = getGlobal().getIDIBuilder();
+						callRes->setErrorResult(diBuilder->createError<ErrorSymbolUnbound>(symName));
 						return;
 					}
 					callRes->setResult(sym->getValue(), nullptr);
@@ -105,8 +106,6 @@ public:
 		getRunContext()->setOnErrorCallback(onErrorCallback);
 		getRunContext()->setDIBuilder(&diBuilder);
 		for (PSexpr& form : program.getProgramForms()) {
-			/*shared_ptr<ICallResult> pCallRes = 
-				std::static_pointer_cast<ICallResult>(make_shared<CallResult>());*/
 			shared_ptr<ICallResult> pCallRes;
 			if (callRes.get() == nullptr) {
 				pCallRes = diBuilder.createCallResult();
@@ -114,7 +113,7 @@ public:
 			else {
 				pCallRes = callRes;
 			}
-			//shared_ptr<ICallResult> pCallRes;
+
 			pLastResult.swap(pCallRes);
 			evalForm(form, pLastResult);
 			if (pLastResult->getStatus() == EResultStatus::error) {

@@ -45,23 +45,27 @@ public:
 
 class LispFunction : public ILispFunction, public CClass {
 protected:
+	IDIBuilder*& getDiBuilder() {
+		return getGlobal().getIDIBuilder();
+	}
+
+	shared_ptr<Cons> createCons(PSexpr& expr1, PSexpr& expr2) {
+		return getDiBuilder()->createCons(expr1, expr2);
+	}
+
+	shared_ptr<Nil> createNil() {
+		return getDiBuilder()->createNil();
+	}
+
+	shared_ptr<ArgsList> createArgsList() {
+		return getDiBuilder()->createArgsList();
+	}
+
 	// TODO!!! Use ICallRes!!! (for error reaction)
 	/*static */PSexpr evalArg(IRunContext& ctx, PSexpr& arg, shared_ptr<ICallResult>& res) {
-		
-		/*auto diBuilder = ctx.getDIBuilder();
-		shared_ptr<ICallResult> pLocCallRes = diBuilder->createCallResult();*/
-
-			//std::static_pointer_cast<ICallResult>(make_shared<CallResult>());
-		//CallResult locCallRes{};
-
-		//ctx.evalForm(arg, *pLocCallRes);
-
 		ctx.evalForm(arg, res);
 		return res->getResult();
 	}
-	/*virtual void call(IRunContext& ctx, ArgsList& args, shared_ptr<ICallResult>& res) override {
-		callConcrete(ctx, args, (*res));
-	}*/
 };
 
 class LispSetfFunction : public LispFunction {
@@ -186,27 +190,7 @@ public:
 	}
 
 	virtual shared_ptr<IPackage> getPackage() override {
-		/*std::static_pointer_cast<IPackage>(*/
-		/*static shared_ptr<IPackage> package = make_shared<Package>(diBuilder);*/
 		static shared_ptr<IPackage> package = diBuilder.createPackage();
 		return package;
 	}
 };
-
-//class PlusLispFunction : public LispFunction {
-//public:
-//	//void call(ArgsList& args, CallResult& res) override {
-//	//	auto oneArg = reinterpret_cast<Number*>(args.get(0).get());
-//	//	auto twoArg = reinterpret_cast<Number*>(args.get(1).get());
-//	//	if (oneArg == nullptr || twoArg == nullptr) {
-//	//		cerr << "Bad args\n";
-//	//		exit(-1);
-//	//	}
-//	//	//Sexpr* resNumber = new Number(oneArg->getValue() + twoArg->getValue());
-//	//	shared_ptr<Sexpr> resNumber = std::static_pointer_cast<Sexpr>(
-//	//		make_shared<Number>(oneArg->getValue() + twoArg->getValue()));
-//	//	res.setResult(resNumber, nullptr /*[resNumber]() {
-//	//		delete resNumber;
-//	//		}*/);
-//	//}
-//};
