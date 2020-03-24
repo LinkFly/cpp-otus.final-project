@@ -231,6 +231,7 @@ public:
 	virtual void read(gstring& programText, IProgram& program) {
 		/*sReaderContext ctx;*/
 		/*ReadTable table;*/
+		//auto diBuilder = getGlobal().getIDIBuilder();
 		PSexpr resSexpr;
 		bool isListStarted = false;
 		vector<PSexpr> list{};
@@ -266,7 +267,9 @@ public:
 		};
 		auto handleStartList = [this, &elemsStack, &listStack, &resSexpr, &isListStarted]() {
 			isListStarted = true;
-			auto pElemsList = make_shared<vector<PSexpr>>();
+			/*auto pElemsList = make_shared<vector<PSexpr>>();*/
+			auto pElemsList = diBuilder.createPSexprCol();
+			
 			elemsStack.push(pElemsList);
 			auto nil = diBuilder.createNil();
 			listStack.push(nil);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <vector>
 #include <variant>
 #include <memory>
 
@@ -35,6 +36,7 @@
 using std::map;
 using std::shared_ptr;
 using std::make_shared;
+using std::vector;
 
 class DIBuilder : public IDIBuilder, public CClass {
 public:
@@ -129,4 +131,13 @@ public:
 	shared_ptr<ConcreteLispFunction> createLispFunction() {
 		return create<ConcreteLispFunction>();
 	}
+
+	virtual shared_ptr<vector<PSexpr>> createPSexprCol() override {
+		return create<vector<PSexpr>>();
+	}
+
+	virtual shared_ptr<NsMap> createNsMap() override {
+		return create<NsMap>();
+	}
+	
 };

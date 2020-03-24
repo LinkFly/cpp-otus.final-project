@@ -142,11 +142,11 @@ void freeGlobal() {
 
 class LispEngineBase {
 private:
-	Global global;
+	/*Global global;*/
 public:
-	Global& getGlobal() {
+	virtual Global& getGlobal() = 0;/* {
 		return global;
-	}
+	}*/
 };
 
 LispEngineBase* lispEngine;

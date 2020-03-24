@@ -14,21 +14,20 @@
 
 class LispEngine : public ILispEngine, public CClass, public LispEngineBase {
 	DIBuilder diBuilder;
-	IDIBuilder& idiBuilder = *(dynamic_cast<IDIBuilder*>(&diBuilder));
-	shared_ptr<IReader> reader = diBuilder.createReader();
-	shared_ptr<IScope> scope = diBuilder.createScope();
-	shared_ptr<IScope> fnScope = diBuilder.createScope();
+	Global global;
+	IDIBuilder& idiBuilder;
+	shared_ptr<IReader> reader;
+	shared_ptr<IScope> scope;
+	shared_ptr<IScope> fnScope;
 	/*shared_ptr<IProgram> program = diBuilder.createProgram(idiBuilder);*/
-	shared_ptr<IEvaluator> evaluator = diBuilder.createEvaluator(this);
-	shared_ptr<IEvaluator> topLevelEvaluator = diBuilder.createEvaluator(this);
-	shared_ptr<SetfSymbolFunction> setfSymbolFunction = diBuilder.create<SetfSymbolFunction>();
-	shared_ptr<Nil> nil = diBuilder.createNil();
-	shared_ptr<Printer> printer = diBuilder.createPrinter();
-	shared_ptr<Repl> repl = diBuilder.createRepl(*this);
+	shared_ptr<IEvaluator> evaluator;
+	shared_ptr<IEvaluator> topLevelEvaluator;
+	shared_ptr<SetfSymbolFunction> setfSymbolFunction;
+	shared_ptr<Nil> nil;
+	shared_ptr<Printer> printer;
+	shared_ptr<Repl> repl;
 	ErrorCallback errCallback;
 
-	Global global = Global{};
-	
 	bool isQuit = false;
 public:
 	/*static Global* global;*/
@@ -37,6 +36,83 @@ public:
 	//void init() {
 	//	global = make_shared<Global>();
 	//}
+
+	LispEngine() : idiBuilder{ *(dynamic_cast<IDIBuilder*>(&diBuilder)) } {
+		setLispEngine(dynamic_cast<LispEngineBase*>(this));
+		global = Global{};
+		getGlobal().setIDIBuilder(&diBuilder);
+		evaluator = diBuilder.createEvaluator(this);
+		getGlobal().setEvaluator(evaluator);
+
+		reader = diBuilder.createReader();
+		scope = diBuilder.createScope();
+		fnScope = diBuilder.createScope();
+		//TODO! Analyze it - maybe not need
+		topLevelEvaluator = diBuilder.createEvaluator(this);
+		setfSymbolFunction = diBuilder.create<SetfSymbolFunction>();
+		nil = diBuilder.createNil();
+		printer = diBuilder.createPrinter();
+		repl = diBuilder.createRepl(*this);
+		errCallback;
+
+		
+		//initGlobal();
+		//auto fn = [this]() {
+		//	return global;
+		//};
+		//setFnGlobal(&fn);
+		/*setGlobal(&global);*/
+
+		
+
+		
+
+		initTopLevelRunContext();
+		errCallback = [](shared_ptr<Error>& err) {
+			cerr << err->getMessage() << endl;
+		};
+		getGlobal().getTopLevelRunContext()->setOnErrorCallback(errCallback);
+
+		/*repl = diBuilder.createRepl(*this);*/
+		getGlobal().getTopLevelRunContext()->getProgram()->getProgramContext()->setScope(scope);
+		getGlobal().getTopLevelRunContext()->getProgram()->getProgramContext()->setFnScope(fnScope);
+
+		registerLispFunction<PlusLispFunction>("plus");
+		registerLispFunction<PlusLispFunction>("+");
+		registerLispFunction<MinusLispFunction>("-");
+		registerLispFunction<MultipleLispFunction>("*");
+		registerLispFunction<DivideLispFunction>("/");
+
+		registerLispFunction<CarLispFunction>("car");
+		registerLispFunction<CdrLispFunction>("cdr");
+		registerLispFunction<ConsLispFunction>("cons");
+		registerLispFunction<SetqLispFunction>("setq");
+		registerLispFunction<QuoteLispFunction>("quote");
+		registerLispFunction<IfLispFunction>("if");
+		registerLispFunction<LetLispFunction>("let");
+		registerLispFunction<EvalLispFunction>("eval");
+		registerLispFunction<LambdaLispFunction>("lambda");
+		registerLispFunction<ApplyLispFunction>("apply");
+		registerLispFunction<LoadLispFunction>("load");
+		registerLispFunction<QuitLispFunction>("quit");
+
+		// Predicates
+		registerLispFunction<SymbolpLispFunction>("symbolp");
+		registerLispFunction<AtompLispFunction>("atomp");
+		registerLispFunction<ConspLispFunction>("consp");
+		registerLispFunction<NumberpLispFunction>("numberp");
+		registerLispFunction<FunctionpLispFunction>("functionp");
+		registerLispFunction<StringpLispFunction>("stringp");
+		//////
+
+		registerLispFunction<TagbodyLispFunction>("tagbody");
+		registerLispFunction<PrintLispFunction>("print");
+
+		registerSymbolSelfEvaluated("t");
+		registerSymbolSelfEvaluated("nil");
+		registerSymbolValue("nil", std::static_pointer_cast<Sexpr>(nil));
+
+	}
 	
 	virtual void setQuit() override {
 		isQuit = true;
@@ -145,65 +221,10 @@ public:
 		//clean();
 		//setGlobal(nullptr);
 	}
-	LispEngine() {
-		getGlobal().setIDIBuilder(&diBuilder);
-		//initGlobal();
-		//auto fn = [this]() {
-		//	return global;
-		//};
-		//setFnGlobal(&fn);
-		/*setGlobal(&global);*/
-
-		setLispEngine(dynamic_cast<LispEngineBase*>(this));
-
-		getGlobal().setEvaluator(evaluator);
-
-		initTopLevelRunContext();
-		errCallback = [](shared_ptr<Error>& err) {
-			cerr << err->getMessage() << endl;
-		};
-		getGlobal().getTopLevelRunContext()->setOnErrorCallback(errCallback);
-		
-		/*repl = diBuilder.createRepl(*this);*/
-		getGlobal().getTopLevelRunContext()->getProgram()->getProgramContext()->setScope(scope);
-		getGlobal().getTopLevelRunContext()->getProgram()->getProgramContext()->setFnScope(fnScope);
-		
-		registerLispFunction<PlusLispFunction>("plus");
-		registerLispFunction<PlusLispFunction>("+");
-		registerLispFunction<MinusLispFunction>("-");
-		registerLispFunction<MultipleLispFunction>("*");
-		registerLispFunction<DivideLispFunction>("/");
-		
-		registerLispFunction<CarLispFunction>("car");
-		registerLispFunction<CdrLispFunction>("cdr");
-		registerLispFunction<ConsLispFunction>("cons");
-		registerLispFunction<SetqLispFunction>("setq");
-		registerLispFunction<QuoteLispFunction>("quote");
-		registerLispFunction<IfLispFunction>("if");
-		registerLispFunction<LetLispFunction>("let");
-		registerLispFunction<EvalLispFunction>("eval");
-		registerLispFunction<LambdaLispFunction>("lambda");
-		registerLispFunction<ApplyLispFunction>("apply");
-		registerLispFunction<LoadLispFunction>("load");
-		registerLispFunction<QuitLispFunction>("quit");
-
-		// Predicates
-		registerLispFunction<SymbolpLispFunction>("symbolp");
-		registerLispFunction<AtompLispFunction>("atomp");
-		registerLispFunction<ConspLispFunction>("consp");
-		registerLispFunction<NumberpLispFunction>("numberp");
-		registerLispFunction<FunctionpLispFunction>("functionp");
-		registerLispFunction<StringpLispFunction>("stringp");
-		//////
-
-		registerLispFunction<TagbodyLispFunction>("tagbody");
-		registerLispFunction<PrintLispFunction>("print");
-
-		registerSymbolSelfEvaluated("t");
-		registerSymbolSelfEvaluated("nil");
-		registerSymbolValue("nil", std::static_pointer_cast<Sexpr>(nil));
-		
+	virtual Global& getGlobal() override {
+		return global;
 	}
+	
 	void readProgram(gstring& sProgram) {
 		reader->read(sProgram, *getProgram().get());
 	}

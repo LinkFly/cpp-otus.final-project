@@ -41,5 +41,7 @@ public:
 	virtual shared_ptr<IMemoryManager> createMemoryManager() = 0;
 	virtual shared_ptr<IRunContext> createRunContext(IEvaluator& evaluator) = 0;
 	virtual shared_ptr<ICallResult> createCallResult() = 0;
+	virtual shared_ptr<vector<PSexpr>> createPSexprCol() = 0;
+	virtual shared_ptr<NsMap> createNsMap() = 0;
 
 };

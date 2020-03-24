@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstdint>
 #include <memory>
+#include <map>
 
 #include "general-types.h"
 #include "forward-declarations.h"
@@ -16,6 +17,8 @@ using std::shared_ptr;
 using std::unique_ptr;
 using std::make_shared;
 using std::make_unique;
+using std::map;
+
 
 #ifdef _MSC_VER
 #define __PRETTY_FUNCTION__ __FUNCSIG__
@@ -27,6 +30,8 @@ void error(const gstring& errMes, int errCode = -1) {
 }
 
 using PSexpr = shared_ptr<Sexpr>;
+using NsMap = map<gstring, PSexpr>;
+using PNsMap = shared_ptr<NsMap>;
 
 // Enums
 enum class EResultStatus {

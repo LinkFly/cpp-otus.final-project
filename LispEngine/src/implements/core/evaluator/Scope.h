@@ -10,13 +10,17 @@ using std::map;
 
 class Scope : public IScope, public CClass {
 	//friend class Scope;
-	using NsMap = map<gstring, PSexpr>;
-	using PNsMap = shared_ptr<NsMap>;
-	PNsMap nsTable = make_shared<NsMap>();
+	
+	/*PNsMap nsTable = make_shared<NsMap>();*/
+	PNsMap nsTable = getGlobal().getIDIBuilder()->createNsMap();
+	
 	//shared_ptr<IScope> nextScope;
 	shared_ptr<IScope> parentScope;
 	//DIBuilder diBuilder;
 public:
+	Scope() {
+
+	}
 	virtual void add(const gstring& name, PSexpr& sexpr) override {
 		(*nsTable)[name] = sexpr;
 	}
