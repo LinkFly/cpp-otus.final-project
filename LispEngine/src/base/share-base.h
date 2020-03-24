@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../build/configure.h"
+#include "../../build/configure.h"
 
 #include <iostream>
 #include <cstdint>

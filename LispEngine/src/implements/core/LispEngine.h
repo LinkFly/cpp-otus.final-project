@@ -15,7 +15,7 @@
 class LispEngine : public ILispEngine, public CClass, public LispEngineBase {
 	DIBuilder diBuilder;
 	IDIBuilder& idiBuilder = *(dynamic_cast<IDIBuilder*>(&diBuilder));
-	shared_ptr<IReader> reader = diBuilder.createReader(idiBuilder);
+	shared_ptr<IReader> reader = diBuilder.createReader();
 	shared_ptr<IScope> scope = diBuilder.createScope();
 	shared_ptr<IScope> fnScope = diBuilder.createScope();
 	/*shared_ptr<IProgram> program = diBuilder.createProgram(idiBuilder);*/
@@ -73,7 +73,7 @@ public:
 	void registerLispFunction(const gstring& symName) {
 		PSexpr& symSexpr = createSymbol(symName);
 
-		shared_ptr<ILispFunction> plusLispFunction = diBuilder.create<TConcreteFunction>();
+		shared_ptr<ILispFunction> plusLispFunction = diBuilder.createLispFunction<TConcreteFunction>();
 		shared_ptr<Function> plusFunction = diBuilder.createFunction(plusLispFunction);
 
 
@@ -280,4 +280,3 @@ public:
 		repl->run(getGlobal().getRunContext());
 	}
 };
-
