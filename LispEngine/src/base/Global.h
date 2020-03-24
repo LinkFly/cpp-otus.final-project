@@ -19,6 +19,7 @@ public:
 	shared_ptr<IRunContext> pRunContext;
 	shared_ptr<IRunContext> pTopLevelRunContext;
 	shared_ptr<IEvaluator> evaluator;
+	IDIBuilder* diBuilder;
 
 	Global() {
 		memoryManager = std::dynamic_pointer_cast<IMemoryManager>(make_shared<MemoryManager>());
@@ -30,6 +31,16 @@ public:
 
 		}
 	}
+
+	void setIDIBuilder(IDIBuilder* diBuilder) {
+		this->diBuilder = diBuilder;
+	}
+	IDIBuilder*& getIDIBuilder() {
+		return this->diBuilder;
+	}
+	//DIBuilder* getDiBuilder() {
+	//	return reinterpret_cast<DIBuilder*>(this->diBuilder);
+	//}
 	/*shared_ptr<DIBuilder> getDiBuilder() {
 		return make_shared<DIBuilder>();
 	}*/

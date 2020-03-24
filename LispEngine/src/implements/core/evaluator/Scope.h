@@ -4,7 +4,7 @@
 
 #include "../../../base/share.h"
 #include "../../../interfaces/core/evaluator/IScope.h"
-//#include "../DiBuilder.h"
+//#include "../../DiBuilder.h"
 
 using std::map;
 
@@ -40,9 +40,8 @@ public:
 		this->parentScope = parentScope;
 	}
 	virtual shared_ptr<IScope> pushNewScope(shared_ptr<IScope> parentScope) override {
-		shared_ptr<IScope> newScope = make_shared<Scope>();
-		newScope->setParentScope(parentScope); //shared_ptr<IScope>(dynamic_cast<IScope*>(this));
-		//nextScope = std::dynamic_pointer_cast<IScope>(newScope);
+		shared_ptr<IScope> newScope = getGlobal().getIDIBuilder()->createScope();
+		newScope->setParentScope(parentScope);
 		return newScope;
 	}
 	virtual shared_ptr<IScope> popScope() override {

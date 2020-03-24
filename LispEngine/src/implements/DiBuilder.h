@@ -85,7 +85,7 @@ public:
 		return create<Lambda>(params, forms);
 	}
 	
-	shared_ptr<IScope> createScope() override {
+	virtual shared_ptr<IScope> createScope() override {
 		return bind<IScope, Scope>();
 	}
 

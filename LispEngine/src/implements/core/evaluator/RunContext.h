@@ -9,8 +9,9 @@
 class RunContext : public IRunContext, public CClass {
 	IEvaluator& evaluator;
 	shared_ptr<IRunContext> createRunContext(shared_ptr<IRunContext>& parent) {
-		shared_ptr<IRunContext> ctx = 
-			std::static_pointer_cast<IRunContext>(make_shared<RunContext>(evaluator, diBuilder));
+		shared_ptr<IRunContext> ctx =
+			getGlobal().getIDIBuilder()->createRunContext(evaluator);
+			//std::static_pointer_cast<IRunContext>(make_shared<RunContext>(evaluator, diBuilder));
 		ctx->setLevel(getLevel() + 1);
 		ctx->setParentContext(parent);
 		/*ctx->getParentContext().reset(this);*/

@@ -146,7 +146,7 @@ public:
 		//setGlobal(nullptr);
 	}
 	LispEngine() {
-		
+		getGlobal().setIDIBuilder(&diBuilder);
 		//initGlobal();
 		//auto fn = [this]() {
 		//	return global;

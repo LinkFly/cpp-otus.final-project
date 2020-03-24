@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../base/share.h"
+#include "../../base/share.h"
 
 class ILispEngine: public IInterface {
 public:
