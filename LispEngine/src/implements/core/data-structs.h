@@ -11,68 +11,6 @@
 
 #include "../../interfaces/core/i-data-structs.h"
 
-using std::unique_ptr;
-
-////////////////////////////////////////// Experimental /////////////////////////////////
-class NumberData : public IValueData, CClass {
-	int32_t num;
-	short_size getCountBits() override {
-		return sizeof(num) * 8;
-	}
-public:
-	NumberData(int32_t numVal) {
-		num = numVal;
-	}
-	int32_t getNumber() { return num; }
-};
-
-class Value : public IValue, CClass {
-protected:
-	ETypeId typeId;
-	shared_ptr<IValueData> data;
-public:
-	void setValueComponents(ETypeId typeId, shared_ptr<IValueData> valueData) override {
-		this->typeId = typeId;
-		this->data = valueData;
-	}
-	tuple<ETypeId, shared_ptr<IValueData>> getValueComponents() override {
-		return make_tuple(typeId, data);
-	}
-};
-
-class NumberValue : public Value {
-public:
-	NumberValue(): NumberValue(0) {}
-	NumberValue(int32_t numVal) {
-		auto data = make_shared<NumberData>(numVal);
-		setValueComponents(ETypeId::number, data);
-	}
-	int32_t getNumber() {
-		auto pair = getValueComponents();
-		return dynamic_cast<NumberData*>(std::get<1>(pair).get())->getNumber();
-	}
-};
-
-class Block: public CClass {
-public:
-	uint8_t* ptr = nullptr;
-	void init(size_t size) {
-		if (ptr != nullptr) {
-			delete[] ptr;
-		}
-		ptr = new uint8_t[size];
-	}
-	~Block() {
-		delete[] ptr;
-	}
-
-
-};
-////////////////////// end Experimental /////////////////////
-
-
-///////////////////////////////////////////////////
-
 class ArgsList : public CClass {
 	vector<PSexpr> args;
 public:
@@ -103,11 +41,11 @@ struct TypeBaseStruct {
 
 };
 
-struct NilStruct: TypeBaseStruct {
+struct NilStruct : TypeBaseStruct {
 	void* nil = nullptr;
 };
 
-struct NumberStruct: TypeBaseStruct {
+struct NumberStruct : TypeBaseStruct {
 	int64_t num;
 	int64_t operator=(int64_t val) {
 		return num = val;
@@ -117,7 +55,7 @@ struct NumberStruct: TypeBaseStruct {
 	}
 };
 
-class CustomType: TypeBaseStruct {
+class CustomType : TypeBaseStruct {
 
 };
 
@@ -201,12 +139,12 @@ union TypeStruct {
 	FunctionStruct function;
 	/*LambdaStruct lambda;*/
 	CustomTypeStruct custom;
-	public:
-		TypeStruct() {};
-		~TypeStruct() {};
+public:
+	TypeStruct() {};
+	~TypeStruct() {};
 };
 
-class DynamicType: public CClass{
+class DynamicType : public CClass {
 public:
 	ETypeId typeId;
 	TypeStruct tstruct;
@@ -432,7 +370,7 @@ class Lambda : public Function, public LambdaBase {
 		return dtype.tstruct.function.funcDesc->lambdaDesc->forms;
 	}
 public:
-	Lambda(PSexpr params, PSexpr forms): Function() {
+	Lambda(PSexpr params, PSexpr forms) : Function() {
 		dtype.typeId = ETypeId::function;
 		/*if (dtype.tstruct.function.funcDesc != nullptr) {
 			delete dtype.tstruct.function.funcDesc;
@@ -460,7 +398,7 @@ public:
 	}
 	//using IDIBuilder = typename ::IDIBuilder;
 	/*class IDIBuilder;*/
-	
+
 	//PSexpr mergeParamsArgs(PSexpr params, ArgsList& args) {
 	//	auto cons = std::static_pointer_cast<Cons>(params);
 	//	auto diBuilder = getGlobal().getRunContext()->getDIBuilder();
@@ -488,7 +426,7 @@ public:
 			res = diBuilder->createCons(curVarVal, res);
 			cons = std::static_pointer_cast<Cons>(cons->cdr());
 		}
-		
+
 		//getGlobal().getRunContext()->debugPrint(res);
 		return res;
 	}
