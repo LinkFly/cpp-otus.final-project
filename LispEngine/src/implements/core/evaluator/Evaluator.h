@@ -5,7 +5,6 @@
 #include "../../../base/share.h"
 #include "../../../interfaces/core/evaluator/IProgram.h"
 #include "../../../interfaces/IDiBuilder.h"
-//#include "../../implements/DiBuilder.h"
 #include "../../../interfaces/core/ILispEngine.h"
 #include "../../../interfaces/core/IRepl.h"
 
@@ -24,9 +23,6 @@ public:
 	Evaluator(IDIBuilder& diBuilder, ILispEngine* lispEngine) : 
 		diBuilder{ diBuilder }, lispEngine{ lispEngine } {}
 
-	/*virtual void evalForm(PSexpr& form, shared_ptr<ICallResult> callRes) override {
-		evalForm(form, *callRes);
-	}*/
 	virtual void evalForm(PSexpr& form, shared_ptr<ICallResult> callRes) override {
 		if (!form->isCons()) {
 			if (form->isSymbol()) {
@@ -57,11 +53,6 @@ public:
 		while (nextSexpr->isCons()) {
 			auto nextCons = std::static_pointer_cast<Cons>(nextSexpr);
 			auto nextArg = nextCons->car();
-			/*if (nextArg->isCons()) {
-				CallResult locCallRes;
-				evalForm(nextArg, locCallRes);
-				nextArg = locCallRes.result;
-			}*/
 			args.addArg(nextArg);
 			nextSexpr = nextCons->cdr();
 		}
@@ -109,8 +100,6 @@ public:
 	}
 
 	virtual void eval(shared_ptr<IRunContext> ctx, shared_ptr<ICallResult> callRes, ErrorCallback onErrorCallback = nullptr) override {
-		/*createRunContext();*/
-		//auto& ctx = getRunContext();
 		auto& program = ctx->getProgram();
 		ctx->setOnErrorCallback(onErrorCallback);
 		ctx->setDIBuilder(&diBuilder);
@@ -125,7 +114,6 @@ public:
 
 			pLastResult.swap(pCallRes);
 			evalForm(form, pLastResult);
-			// error handling moved to evalForm
 		}
 	}
 
