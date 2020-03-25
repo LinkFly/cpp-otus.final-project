@@ -19,9 +19,7 @@ class LispEngine : public ILispEngine, public CClass, public LispEngineBase {
 	shared_ptr<IReader> reader;
 	shared_ptr<IScope> scope;
 	shared_ptr<IScope> fnScope;
-	/*shared_ptr<IProgram> program = diBuilder.createProgram(idiBuilder);*/
 	shared_ptr<IEvaluator> evaluator;
-	shared_ptr<IEvaluator> topLevelEvaluator;
 	shared_ptr<SetfSymbolFunction> setfSymbolFunction;
 	shared_ptr<Nil> nil;
 	shared_ptr<Printer> printer;
@@ -40,8 +38,7 @@ public:
 		reader = diBuilder.createReader();
 		scope = diBuilder.createScope();
 		fnScope = diBuilder.createScope();
-		//TODO! Analyze it - maybe not need
-		topLevelEvaluator = diBuilder.createEvaluator(this);
+
 		setfSymbolFunction = diBuilder.create<SetfSymbolFunction>();
 		nil = diBuilder.createNil();
 		printer = diBuilder.createPrinter();
@@ -162,19 +159,10 @@ public:
 		PSexpr symSexpr = createSymbol(symName);
 		shared_ptr<Symbol> sym = std::static_pointer_cast<Symbol>(symSexpr);
 		sym->setSelfEval();
-		/*PSexpr symSexpr = createSymbol(symName);
-		shared_ptr<Symbol> sym = std::static_pointer_cast<Symbol>(symSexpr);
-		sym->setValue(symSexpr);*/
-		//shared_ptr<Nil> pnil = diBuilder.createNil();
-		////auto nil = *pnil;
-		//registerSymbolValue(symName, *pnil);
-		//PSexpr& symSexpr = createSymbol(symName);
-		//std::static_pointer_cast<Symbol>(symSexpr)->setValue(symSexpr);
-		////sym->setValue(symSexpr);
 	}
 
 	void initTopLevelRunContext() {
-		shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*topLevelEvaluator);
+		shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*evaluator);
 		ctx->setDIBuilder(&diBuilder);
 		getGlobal().setTopLevelRunContext(ctx);
 	}

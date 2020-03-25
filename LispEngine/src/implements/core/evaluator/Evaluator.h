@@ -74,23 +74,17 @@ public:
 	virtual void setQuit() override {
 		lispEngine->setQuit();
 	}
-	virtual void createRunContext(shared_ptr<IScope>& scope, shared_ptr<IScope>& fnScope, bool isNewDebugLevel) override {
-		//shared_ptr<IRunContext> ctx = diBuilder.createRunContext(*this);
-		//shared_ptr<IRunContext> actualCtx;
-		auto& actualCtx = getGlobal().getRunContext();
+	virtual void createRunContext(shared_ptr<IScope>& scope, shared_ptr<IScope>& fnScope, 
+		bool isNewDebugLevel) override
+	{
+		auto& actualCtx = getRunContext();
 		bool bCurCtxIsTopLevel = actualCtx->isTopLevel();
-		/*if (curCtx.get() != nullptr) {
-			actualCtx = curCtx;
-			bCurCtxIsTopLevel = false;
-		}
-		else {
-			actualCtx = getGlobal().getTopLevelRunContext();
-			bCurCtxIsTopLevel = true;
-		}*/
+
 		shared_ptr<IRunContext> ctx;
 		if (!(isNewDebugLevel || bCurCtxIsTopLevel)) {
 			actualCtx = actualCtx->popContext();
 		}
+
 		ctx = actualCtx->pushNewContext(actualCtx);
 		ctx->getProgram()->getProgramContext()->setScope(scope);
 		ctx->getProgram()->getProgramContext()->setFnScope(fnScope);
