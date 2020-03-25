@@ -10,16 +10,23 @@
 using std::shared_ptr;
 
 
-
+// TODO Rename (not std interface (contained template-functions)
 class IDIBuilder : public IInterface {
 public:
-	//template<class Interface>
-	///*virtual T& get() = 0;*/ //denied virtual
-	//shared_ptr<Interface>& get() {};
+	template<class T, typename ...Args>
+	shared_ptr<T> create(Args&... args) {
+		return make_shared<T>(args...);
+	}
 
-	//template<class Interface, typename ...Args>
-	///*virtual T create(Args... args) = 0;*/ //denied virtual
-	//shared_ptr<Interface> create(Args... args) { return shared_ptr<Interface>{nullptr}; }
+	template<class TInterface, class TImplement = TInterface, class ...Args>
+	shared_ptr<TInterface> bind(Args... args) {
+		return std::static_pointer_cast<TInterface>(make_shared<TImplement>(args...));
+	}
+
+	template<class T, typename ...Args>
+	shared_ptr<T> createError(Args&... args) {
+		return make_shared<T>(args...);
+	}
 
 	virtual shared_ptr<IScope> createScope() = 0;
 	virtual shared_ptr<Number> createNumber(int64_t num) = 0;
@@ -44,19 +51,4 @@ public:
 	virtual shared_ptr<ArgsList> createArgsList() = 0;
 	virtual shared_ptr<vector<PSexpr>> createPSexprCol() = 0;
 	virtual shared_ptr<NsMap> createNsMap() = 0;
-	
-	template<class T, typename ...Args>
-	shared_ptr<T> create(Args&... args) {
-		return make_shared<T>(args...);
-	}
-
-	template<class TInterface, class TImplement = TInterface, class ...Args>
-	shared_ptr<TInterface> bind(Args... args) {
-		return std::static_pointer_cast<TInterface>(make_shared<TImplement>(args...));
-	}
-
-	template<class T, typename ...Args>
-	shared_ptr<T> createError(Args&... args) {
-		return make_shared<T>(args...);
-	}
 };
