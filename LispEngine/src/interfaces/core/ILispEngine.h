@@ -12,4 +12,5 @@ public:
 	virtual void setQuit() = 0;
 	virtual bool getQuit() = 0;
 	virtual shared_ptr<IRepl> getRepl() = 0;
+	virtual void readProgram(gstring& sProgram, shared_ptr<IRunContext> ctx) = 0;
 };

@@ -45,18 +45,6 @@ public:
 		repl = diBuilder.createRepl(*this);
 		errCallback;
 
-		
-		//initGlobal();
-		//auto fn = [this]() {
-		//	return global;
-		//};
-		//setFnGlobal(&fn);
-		/*setGlobal(&global);*/
-
-		
-
-		
-
 		initTopLevelRunContext();
 		errCallback = [](shared_ptr<Error>& err) {
 			cerr << err->getMessage() << endl;
@@ -208,6 +196,11 @@ public:
 	
 	void readProgram(gstring& sProgram) {
 		reader->read(sProgram, *getProgram().get());
+	}
+
+	virtual void readProgram(gstring& sProgram, shared_ptr<IRunContext> ctx) override {
+		/*auto& pProgram = ctx->getProgram();
+		reader->read(sProgram, *(pProgram.get()));*/
 	}
 
 	PSexpr parseSymbol(const gstring& sSym) {
