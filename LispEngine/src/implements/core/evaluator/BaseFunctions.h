@@ -10,7 +10,7 @@
 #include "../../../interfaces/core/evaluator/IRunContext.h"
 #include "../../../interfaces/core/evaluator/ICallResult.h"
 
-#include "../../../implements/core/evaluator/Program.h"
+#include "../../../implements/core/evaluator/program-structs.h"
 #include "../Printer.h"
 #include "../../../utils/system/System.h"
 

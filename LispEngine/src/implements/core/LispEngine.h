@@ -3,12 +3,11 @@
 #include "share.h"
 
 #include "../DiBuilder.h"
-#include "../../interfaces/core/i-data-structs.h"
 #include "../../interfaces/core/evaluator/IScope.h"
 #include "../../interfaces/core/evaluator/i-program-structs.h"
 #include "../../interfaces/core/ILispEngine.h"
 
-#include "evaluator/Program.h"
+#include "evaluator/program-structs.h"
 #include "evaluator/BaseFunctions.h"
 #include "Printer.h"
 

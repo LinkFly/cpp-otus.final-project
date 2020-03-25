@@ -10,7 +10,6 @@
 #include "../base/share.h"
 #include "../interfaces/IDIBuilder.h"
 
-#include "../interfaces/core/i-data-structs.h"
 #include "../interfaces/core/evaluator/IScope.h"
 #include "../interfaces/core/IReader.h"
 #include "../interfaces/core/evaluator/i-program-structs.h"
@@ -21,10 +20,10 @@
 #include "../interfaces/core/ILispEngine.h"
 
 #include "../implements/core/data-structs.h"
-#include "../implements/core/evaluator/Program.h"
+#include "../implements/core/evaluator/program-structs.h"
 #include "../implements/core/evaluator/Scope.h"
 #include "../implements/core/Reader.h"
-#include "../implements/core/evaluator/Program.h"
+#include "../implements/core/evaluator/program-structs.h"
 #include "../implements/core/evaluator/Evaluator.h"
 #include "../implements/core/evaluator/RunContext.h"
 #include "../implements/core/evaluator/CallResult.h"
