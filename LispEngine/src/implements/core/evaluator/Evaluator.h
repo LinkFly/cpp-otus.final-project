@@ -7,6 +7,8 @@
 #include "../../../interfaces/IDiBuilder.h"
 //#include "../../implements/DiBuilder.h"
 #include "../../../interfaces/core/ILispEngine.h"
+#include "../../../interfaces/core/IRepl.h"
+
 
 class Evaluator : public IEvaluator, public CClass {
 	shared_ptr<ICallResult> pLastResult;
@@ -95,11 +97,13 @@ public:
 		return getGlobal().getRunContext();
 	}
 
-	virtual void eval(IProgram& program, shared_ptr<ICallResult> callRes, ErrorCallback onErrorCallback = nullptr) override {
+	virtual void eval(shared_ptr<IRunContext> ctx, shared_ptr<ICallResult> callRes, ErrorCallback onErrorCallback = nullptr) override {
 		/*createRunContext();*/
-		getRunContext()->setOnErrorCallback(onErrorCallback);
-		getRunContext()->setDIBuilder(&diBuilder);
-		for (PSexpr& form : program.getProgramForms()) {
+		//auto& ctx = getRunContext();
+		auto& program = ctx->getProgram();
+		ctx->setOnErrorCallback(onErrorCallback);
+		ctx->setDIBuilder(&diBuilder);
+		for (PSexpr& form : program->getProgramForms()) {
 			shared_ptr<ICallResult> pCallRes;
 			if (callRes.get() == nullptr) {
 				pCallRes = diBuilder.createCallResult();
@@ -116,6 +120,29 @@ public:
 				errCallback(pLastResult->getLastError());
 			}
 		}
+	}
+
+	virtual void evalProgram(shared_ptr<IRunContext> ctx, shared_ptr<ICallResult> callRes = nullptr) override {
+		/*auto& program = getProgram();*/
+		//auto& program = ctx->getProgram();
+		//void createRunContext(bool isNewDebugLevel) {
+		//	evaluator->createRunContext(scope, fnScope, isNewDebugLevel);
+		//}
+		eval(getRunContext(), callRes, [this, &ctx](shared_ptr<Error>& err) {
+			//auto& fnScope = lispEngine->getFnScope();
+			auto& progCtx = ctx->getProgram()->getProgramContext();
+			auto& fnScope = progCtx->getFnScope();
+			auto& scope = progCtx->getScope();
+			shared_ptr<IRepl>& repl = lispEngine->getRepl();
+
+			createRunContext(scope, fnScope, true);
+			
+			repl->printError(err);
+			auto& ctx = getGlobal().getRunContext();
+			ctx->setLastError(err);
+
+			repl->run(ctx);
+			});
 	}
 
 	virtual ICallResult& getLastResult() override {

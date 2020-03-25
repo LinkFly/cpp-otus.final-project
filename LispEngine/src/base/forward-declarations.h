@@ -22,3 +22,4 @@ class String;
 class Cons;
 
 class Printer;
+class IRepl;

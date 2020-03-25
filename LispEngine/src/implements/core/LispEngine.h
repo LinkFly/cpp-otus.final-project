@@ -222,21 +222,13 @@ public:
 		return ctx->getProgram();
 	}
 
-	void evalProgram(shared_ptr<ICallResult> callRes = nullptr) {
-		auto& program = getProgram();
-		evaluator->eval(*program.get(), callRes, [this](shared_ptr<Error>& err) {
-			createRunContext(true);
-
-			repl->printError(err);
-			auto& ctx = getGlobal().getRunContext();
-			ctx->setLastError(err);
-
-			repl->run(ctx);
-			});
+	shared_ptr<IRunContext> getRunContext() {
+		return getGlobal().getRunContext();
 	}
-	//void evalProgram() {
-	//	
-	//}
+
+	void evalProgram(shared_ptr<IRunContext> ctx, shared_ptr<ICallResult> callRes = nullptr) {
+		evaluator->evalProgram(ctx, callRes);
+	}
 
 	template<class ConcreteSexpr>
 	ConcreteSexpr& getLastResult() {
@@ -263,22 +255,25 @@ public:
 	void evalSexprStr(gstring& sexprStr) override {
 		createRunContext(false);
 		readProgram(sexprStr);
-		evalProgram();
+		evalProgram(getGlobal().getRunContext());
 	}
 
 	virtual void evalSexprStr(gstring& sexprStr, shared_ptr<ICallResult> callRes) override {
 		createRunContext(false);
 		readProgram(sexprStr);
-		evalProgram(callRes);
+		evalProgram(getGlobal().getRunContext(), callRes);
 	}
 
 	virtual Printer getPrinter() override {
 		return *printer;
 	}
 
+	virtual shared_ptr<IRepl> getRepl() override {
+		return repl;
+	}
+
 	void runRepl() {
 		createRunContext(true);
-		/*repl->run(getGlobal().getTopLevelRunContext());*/
 		repl->run(getGlobal().getRunContext());
 	}
 };

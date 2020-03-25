@@ -1,17 +1,18 @@
 #pragma once
 
-#include "share.h"
+#include "../../base/share.h"
 
 #include <iostream>
 #include <string>
 
 #include "../../interfaces/core/ILispEngine.h"
+#include "../../interfaces/core/IRepl.h"
 #include "../../interfaces/core/evaluator/IProgram.h"
 
 using std::cin;
 using std::cout;
 
-class Repl : public CClass {
+class Repl : public IRepl, public CClass {
 	gstring prefix = "> ";
 	ILispEngine& lispEngine;
 public:
@@ -21,10 +22,10 @@ public:
 		auto res = lispEngine.getPrinter()(lispEngine.getLastPSexprRes());
 		cout << res << endl;
 	}
-	void printError(shared_ptr<Error>& err) {
+	virtual void printError(shared_ptr<Error>& err) override {
 		cerr << "\n[ERROR]: " << err->getMessage() << endl;
 	}
-	void run(shared_ptr<IRunContext> & ctx) {
+	virtual void run(shared_ptr<IRunContext> & ctx) override {
 		outCommandPrompt(*ctx);
 		while (true) {
 			gstring cmd;
