@@ -14,6 +14,12 @@ class Evaluator : public IEvaluator, public CClass {
 	shared_ptr<ICallResult> pLastResult;
 	IDIBuilder& diBuilder;
 	ILispEngine* lispEngine;
+
+	void errHandler() {
+		auto& global = getGlobal();
+		ErrorCallback& errCallback = global.getRunContext()->getOnErrorCallback();
+		errCallback(pLastResult->getLastError());
+	}
 public:
 	Evaluator(IDIBuilder& diBuilder, ILispEngine* lispEngine) : 
 		diBuilder{ diBuilder }, lispEngine{ lispEngine } {}
@@ -34,6 +40,7 @@ public:
 						auto symName = sym->getName();
 						auto& diBuilder = getGlobal().getIDIBuilder();
 						callRes->setErrorResult(diBuilder->createError<ErrorSymbolUnbound>(symName));
+						errHandler();
 						return;
 					}
 					callRes->setResult(sym->getValue(), nullptr);
@@ -60,6 +67,10 @@ public:
 		}
 		shared_ptr<Function> func = std::static_pointer_cast<Function>(curSym->getFunction());
 		func->call(args, callRes);
+		//////////////
+		if (callRes->getStatus() == EResultStatus::error) {
+			errHandler();
+		}
 	}
 
 	virtual void evalSexprStr(gstring& sexprStr, ICallResult& callRes) override {
@@ -114,35 +125,30 @@ public:
 
 			pLastResult.swap(pCallRes);
 			evalForm(form, pLastResult);
-			if (pLastResult->getStatus() == EResultStatus::error) {
-				auto& global = getGlobal();
-				ErrorCallback& errCallback = global.getRunContext()->getOnErrorCallback();
-				errCallback(pLastResult->getLastError());
-			}
+			// error handling moved to evalForm
 		}
 	}
 
 	virtual void evalProgram(shared_ptr<IRunContext> ctx, shared_ptr<ICallResult> callRes = nullptr) override {
-		/*auto& program = getProgram();*/
-		//auto& program = ctx->getProgram();
-		//void createRunContext(bool isNewDebugLevel) {
-		//	evaluator->createRunContext(scope, fnScope, isNewDebugLevel);
-		//}
-		eval(getRunContext(), callRes, [this, &ctx](shared_ptr<Error>& err) {
-			//auto& fnScope = lispEngine->getFnScope();
-			auto& progCtx = ctx->getProgram()->getProgramContext();
-			auto& fnScope = progCtx->getFnScope();
-			auto& scope = progCtx->getScope();
-			shared_ptr<IRepl>& repl = lispEngine->getRepl();
-
-			createRunContext(scope, fnScope, true);
-			
-			repl->printError(err);
-			auto& ctx = getGlobal().getRunContext();
-			ctx->setLastError(err);
-
-			repl->run(ctx);
+		eval(getRunContext(), callRes, [this](shared_ptr<Error>& err) {
+			defaultErrHandler(err);
 			});
+	}
+
+	void defaultErrHandler(shared_ptr<Error>& err) {
+		auto& lastCtx = getGlobal().getRunContext();
+		auto& progCtx = lastCtx->getProgram()->getProgramContext();
+		auto& fnScope = progCtx->getFnScope();
+		auto& scope = progCtx->getScope();
+		shared_ptr<IRepl>& repl = lispEngine->getRepl();
+
+		createRunContext(scope, fnScope, true);
+
+		repl->printError(err);
+		auto& ctx = getGlobal().getRunContext();
+		ctx->setLastError(err);
+
+		repl->run(ctx);
 	}
 
 	virtual ICallResult& getLastResult() override {
