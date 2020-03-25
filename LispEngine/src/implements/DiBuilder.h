@@ -52,7 +52,8 @@ public:
 	}
 
 	shared_ptr<Nil> createNil() {
-		return create<Nil>();
+		static auto nil = create<Nil>();
+		return nil;
 	}
 
 	virtual shared_ptr<IPackage> createPackage() override {
