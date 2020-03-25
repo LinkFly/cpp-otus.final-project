@@ -64,10 +64,10 @@ public:
 		}
 	}
 
-	virtual void evalSexprStr(gstring& sexprStr, ICallResult& callRes) override {
-		lispEngine->evalSexprStr(sexprStr);
-		callRes = *lispEngine->getLastCallResult();
-	}
+	//virtual void evalSexprStr(gstring& sexprStr, ICallResult& callRes) override {
+	//	lispEngine->evalSexprStr(sexprStr);
+	//	callRes = *lispEngine->getLastCallResult();
+	//}
 
 	virtual void evalSexprStr(gstring& sexprStr, shared_ptr<ICallResult>& callRes) override {
 		//callRes = lispEngine->getLastCallResult();

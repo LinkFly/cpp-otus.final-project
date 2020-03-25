@@ -36,16 +36,8 @@ public:
 		evaluator.setQuit();
 	}
 
-	//virtual void evalForm(PSexpr& sexpr, ICallResult& callRes) override {
-	//	evaluator.evalForm(sexpr, callRes);
-	//}
-
 	virtual void evalForm(PSexpr& sexpr, shared_ptr<ICallResult>& callRes) override {
 		evaluator.evalForm(sexpr, callRes);
-	}
-
-	virtual void evalSexprStr(gstring& sexprStr, ICallResult& callRes) override {
-		evaluator.evalSexprStr(sexprStr, callRes);
 	}
 
 	virtual void evalSexprStr(gstring& sexprStr, shared_ptr<ICallResult>& callRes) override {
@@ -87,12 +79,6 @@ public:
 
 	}
 
-	//virtual PSexpr getResult() override {
-
-	//}
-	//virtual void setResult(PSexpr result) override {
-
-	//}
 	virtual shared_ptr<Error>& getLastError() override {
 		return error;
 	}
@@ -109,14 +95,6 @@ public:
 	virtual void setParentContext(shared_ptr<IRunContext>& runCtx) override {
 		parentCtx = runCtx;
 	}
-
-	//virtual shared_ptr<IRunContext>& getParentContext() override {
-	//	return std::static_pointer_cast<IRunContext>(parentCtx);
-	//}
-
-	//virtual void setParentContext(shared_ptr<IRunContext>& runCtx) override {
-	//	parentCtx = runCtx;
-	//}
 
 	//////////////////////////
 	virtual IDIBuilder* getDIBuilder() override {
@@ -161,9 +139,6 @@ public:
 
 	void debugPrintNext(PSexpr head, PSexpr rest) {
 		debugPrint(head);
-		/*shared_ptr<Cons> cons = std::static_pointer_cast<Cons>(consSexpr);
-		auto car = cons->car();
-		auto cdr = cons->cdr();*/
 		if (rest->isNil()) {
 			cout << " )" << endl;
 		}
@@ -183,45 +158,11 @@ public:
 			debugPrintAtom(consSexpr);
 		}
 		else {
-			cout << " ("; //<< endl << "\t";
+			cout << " (";
 			shared_ptr<Cons> cons = std::static_pointer_cast<Cons>(consSexpr);
 			auto car = cons->car();
 			auto cdr = cons->cdr();
 			debugPrintNext(car, cdr);
 		}
-		//if (consSexpr->isCons()) {
-		//	shared_ptr<Cons> cons = std::static_pointer_cast<Cons>(consSexpr);
-		//	auto car = cons->car();
-		//	auto cdr = cons->cdr();
-		//	cout << "("; //<< endl << "\t";
-		//	//auto curCons = std::static_pointer_cast<Cons>(car);
-		//	debugPrint(car);
-		//	if (cdr->isNil()) {
-		//		cout << ")" << endl;
-		//	}
-		//	else {
-		//		if (!cdr->isCons()) {
-		//			cout << " . ";
-		//			debugPrintAtom(cdr);
-		//		}
-		//		else if (cdr->isCons()) {
-		//			shared_ptr<Cons> cons = std::static_pointer_cast<Cons>(cdr);
-		//			auto curCar = cons->car();
-		//			auto curCdr = cons->cdr();
-		//			debugPrint(curCar);
-		//			if (curCdr->isNil()) {
-		//				cout << ")" << endl;
-		//			}
-		//			else {
-		//				debugPrint(curCdr);
-		//			}
-		//		}
-		//	}
-		//}
-		
-		
-		
-		/*Printer printer;
-		printer(cons);*/
 	}
 };
