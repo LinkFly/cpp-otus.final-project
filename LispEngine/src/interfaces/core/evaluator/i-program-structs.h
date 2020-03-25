@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "../../../base/share.h"
-#include "../i-data-structs.h"
 #include "../../../base/errors.h"
 #include "../evaluator/ICallResult.h"
 
@@ -23,20 +22,20 @@ public:
 	virtual PSexpr getSymbol(const gstring& name) = 0;
 };
 
-class IProgramContext : public IInterface {
-public:
-	virtual void setScope(shared_ptr<IScope>& scope) = 0;
-	virtual shared_ptr<IScope>& getScope() = 0;
-	virtual void setFnScope(shared_ptr<IScope>& scope) = 0;
-	virtual shared_ptr<IScope>& getFnScope() = 0;
-};
-
 class ILispFunction : public IInterface {
 public:
 	virtual void call(IRunContext& ctx, ArgsList& args, shared_ptr<ICallResult>& res) = 0;
 	virtual ~ILispFunction() {
 
 	}
+};
+
+class IProgramContext : public IInterface {
+public:
+	virtual void setScope(shared_ptr<IScope>& scope) = 0;
+	virtual shared_ptr<IScope>& getScope() = 0;
+	virtual void setFnScope(shared_ptr<IScope>& scope) = 0;
+	virtual shared_ptr<IScope>& getFnScope() = 0;
 };
 
 class IProgram : public IInterface {

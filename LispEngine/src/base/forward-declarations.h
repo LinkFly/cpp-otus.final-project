@@ -23,3 +23,6 @@ class Cons;
 
 class Printer;
 class IRepl;
+
+class ILispFunction;
+class Cell;
