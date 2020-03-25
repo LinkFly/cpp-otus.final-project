@@ -46,7 +46,6 @@ public:
 
 	template<class ConcreteSexpr>
 	ConcreteSexpr& getConcreteResult() {
-		//return *reinterpret_cast<ConcreteSexpr*>(result_ptr);
 		return *reinterpret_cast<ConcreteSexpr*>(result.get());
 	}
 

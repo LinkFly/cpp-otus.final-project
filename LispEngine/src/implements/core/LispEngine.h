@@ -5,7 +5,7 @@
 #include "../DiBuilder.h"
 #include "../../interfaces/core/i-data-structs.h"
 #include "../../interfaces/core/evaluator/IScope.h"
-#include "../../interfaces/core/evaluator/IProgram.h"
+#include "../../interfaces/core/evaluator/i-program-structs.h"
 #include "../../interfaces/core/ILispEngine.h"
 
 #include "evaluator/Program.h"
@@ -104,15 +104,11 @@ public:
 		return errCallback;
 	}
 	PSexpr createSymbol(const gstring& symName) {
-		//PSexpr symSexpr = diBuilder.createSymbol(symName);
-		//program->getProgramContext()->getScope()->add(symName, symSexpr);
-		//return symSexpr;
 		PSexpr& symSexpr = getProgram()->createSymbol(symName);
 		return symSexpr;
 	}
 
 	PSexpr& getSymbol(gstring& symName) {
-		/*return scope->get(symName);*/
 		return getProgram()->getProgramContext()->getScope()->get(symName);
 	}
 
@@ -159,36 +155,14 @@ public:
 		static unique_ptr<Global> global;
 		return global;
 	}
-	/* Global* global = nullptr;*/
 
 	static void initGlobal() {
-		/*if (getGlobalController().getGlobal().get() != nullptr) {
-			string err = "ERROR: Global already initialized";
-			error(err);
-		}*/
-		/*if (global != nullptr) {
-			string err = "ERROR: Global already initialized";
-			error(err);
-		}*/
-		/*global = new Global();*/
-		/*auto pGlobal = make_unique<Global>();
-		getPGlobal().swap(pGlobal);*/
-		/*auto ptrGlobal = make_unique<Global>();
-		getGlobalController().setGlobal(ptrGlobal);*/
-
 		createGlobal();
 	}
 	static void clean() {
-		/*getGlobalController().resetGlobal();*/
 		freeGlobal();
 	}
 	~LispEngine() {
-		/*delete global;
-		global = nullptr;*/
-		/*getPGlobal().reset();*/
-
-		//clean();
-		//setGlobal(nullptr);
 	}
 	virtual Global& getGlobal() override {
 		return global;
@@ -198,10 +172,10 @@ public:
 		reader->read(sProgram, *getProgram().get());
 	}
 
-	virtual void readProgram(gstring& sProgram, shared_ptr<IRunContext> ctx) override {
-		/*auto& pProgram = ctx->getProgram();
-		reader->read(sProgram, *(pProgram.get()));*/
-	}
+	//virtual void readProgram(gstring& sProgram, shared_ptr<IRunContext> ctx) override {
+	//	/*auto& pProgram = ctx->getProgram();
+	//	reader->read(sProgram, *(pProgram.get()));*/
+	//}
 
 	PSexpr parseSymbol(const gstring& sSym) {
 		return reader->parseSymbol(sSym, *getProgram());

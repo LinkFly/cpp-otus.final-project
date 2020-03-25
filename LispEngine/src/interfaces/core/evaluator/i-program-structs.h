@@ -21,18 +21,22 @@ class IPackage : public IInterface {
 public:
 	virtual void createSymbol(const gstring& name) = 0;
 	virtual PSexpr getSymbol(const gstring& name) = 0;
-	/*virtual shared_ptr<IScope> pushNewScope(shared_ptr<IScope>& parentScope) = 0;
-	virtual shared_ptr<IScope>& popScope() = 0;*/
 };
 
 class IProgramContext : public IInterface {
 public:
 	virtual void setScope(shared_ptr<IScope>& scope) = 0;
 	virtual shared_ptr<IScope>& getScope() = 0;
-	/*virtual void setPackage(shared_ptr<IPackage>& scope) = 0;
-	virtual shared_ptr<IPackage>& getPackage() = 0;*/
 	virtual void setFnScope(shared_ptr<IScope>& scope) = 0;
 	virtual shared_ptr<IScope>& getFnScope() = 0;
+};
+
+class ILispFunction : public IInterface {
+public:
+	virtual void call(IRunContext& ctx, ArgsList& args, shared_ptr<ICallResult>& res) = 0;
+	virtual ~ILispFunction() {
+
+	}
 };
 
 class IProgram : public IInterface {
@@ -48,24 +52,4 @@ public:
 	virtual PSexpr getSymByName(gstring symName) = 0;
 	virtual shared_ptr<IProgram> getParentProgram() = 0;
 	virtual shared_ptr<IPackage> getPackage() = 0;
-};
-
-
-
-//class LispFunction;
-//class ArgsList;
-
-class LispFunctionBase : public IInterface {
-
-};
-
-class ILispFunction : public LispFunctionBase {
-
-public:
-	//virtual LispFunction(IProgram)
-	virtual void call(IRunContext& ctx, ArgsList& args, shared_ptr<ICallResult>& res) = 0;
-	/*virtual void callConcrete(IRunContext& ctx, ArgsList& args, ICallResult& result) {}*/
-	virtual ~ILispFunction() {
-
-	}
 };

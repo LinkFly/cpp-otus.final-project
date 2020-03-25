@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../base/share.h"
-#include "evaluator/IProgram.h"
+#include "evaluator/i-program-structs.h"
 
 class IReader : public IInterface {
 public:

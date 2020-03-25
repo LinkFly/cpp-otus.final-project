@@ -7,7 +7,7 @@
 #include <map>
 
 #include "../../../base/share.h"
-#include "../../../interfaces/core/evaluator/IProgram.h"
+#include "../../../interfaces/core/evaluator/i-program-structs.h"
 #include "../../../implements/core/data-structs.h"
 #include "../../../interfaces/IDIBuilder.h"
 #include "../../../base/errors.h"

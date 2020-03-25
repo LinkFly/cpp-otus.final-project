@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "../../../base/share.h"
-#include "../../../interfaces/core/evaluator/IProgram.h"
+#include "../../../interfaces/core/evaluator/i-program-structs.h"
 #include "../../../interfaces/IDiBuilder.h"
 #include "../../../interfaces/core/ILispEngine.h"
 #include "../../../interfaces/core/IRepl.h"

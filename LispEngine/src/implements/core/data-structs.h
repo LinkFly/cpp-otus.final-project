@@ -4,7 +4,7 @@
 #include <tuple>
 
 #include "../../base/share.h"
-#include "../../interfaces/core/evaluator/IProgram.h"
+#include "../../interfaces/core/evaluator/i-program-structs.h"
 #include "../../interfaces/core/evaluator/IRunContext.h"
 #include "../../interfaces/core/evaluator/ICallResult.h"
 #include "../../interfaces/IDIBuilder.h"

@@ -7,7 +7,7 @@
 
 #include "../../interfaces/core/ILispEngine.h"
 #include "../../interfaces/core/IRepl.h"
-#include "../../interfaces/core/evaluator/IProgram.h"
+#include "../../interfaces/core/evaluator/i-program-structs.h"
 
 using std::cin;
 using std::cout;

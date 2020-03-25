@@ -7,7 +7,7 @@
 
 #include "../../base/share.h"
 #include "../../interfaces/core/IReader.h"
-#include "../../interfaces/core/evaluator/IProgram.h"
+#include "../../interfaces/core/evaluator/i-program-structs.h"
 //#include "../DiBuilder.h"
 #include "../../interfaces/IDIBuilder.h"
 
