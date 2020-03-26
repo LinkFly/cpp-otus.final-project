@@ -20,6 +20,7 @@
 
 См. описание деталей проекта:
  - [План проекта](docs/project-plan.md)
+ - [Презентация](docs/presentation.md)
  - [Детали реализации](docs/implementation.md)
  - [Внутренне устройство](docs/internal.md)
 
